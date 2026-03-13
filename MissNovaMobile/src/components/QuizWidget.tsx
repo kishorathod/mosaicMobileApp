@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
 import { Text, RadioButton, Button, Card } from 'react-native-paper';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import type { Quiz } from '@/store/slices/courseSlice';
+import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS } from '@/theme/theme';
 
 interface QuizWidgetProps {
     quiz: Quiz;
@@ -29,16 +31,19 @@ const QuizWidget: React.FC<QuizWidgetProps> = ({ quiz, onComplete }) => {
     return (
         <Card style={styles.container}>
             <Card.Content>
-                <Text variant="titleMedium" style={styles.title}>
-                    📝 Quiz Time!
-                </Text>
+                <View style={styles.quizHeader}>
+                    <Icon name="help-circle-outline" size={24} color={COLORS.primary} style={{ marginRight: 8 }} />
+                    <Text variant="titleMedium" style={styles.title}>
+                        Quiz Time!
+                    </Text>
+                </View>
 
                 <Text variant="bodyLarge" style={styles.question}>
                     {quiz.question}
                 </Text>
 
                 <RadioButton.Group value={selectedAnswer} onValueChange={setSelectedAnswer}>
-                    {quiz.options.map((option, index) => (
+                    {quiz.options.map((option: string, index: number) => (
                         <View
                             key={index}
                             style={[
@@ -71,8 +76,17 @@ const QuizWidget: React.FC<QuizWidgetProps> = ({ quiz, onComplete }) => {
                                 styles.resultBadge,
                                 isCorrect ? styles.correctBadge : styles.incorrectBadge,
                             ]}>
-                            <Text variant="titleMedium" style={styles.resultText}>
-                                {isCorrect ? '✅ Correct!' : '❌ Incorrect'}
+                            <Icon
+                                name={isCorrect ? "check-circle" : "alert-circle"}
+                                size={28}
+                                color={isCorrect ? COLORS.success : COLORS.error}
+                                style={{ marginBottom: 8 }}
+                            />
+                            <Text variant="titleMedium" style={[
+                                styles.resultText,
+                                { color: isCorrect ? COLORS.success : COLORS.error }
+                            ]}>
+                                {isCorrect ? 'Correct!' : 'Incorrect'}
                             </Text>
                         </View>
 
@@ -102,71 +116,91 @@ const QuizWidget: React.FC<QuizWidgetProps> = ({ quiz, onComplete }) => {
 
 const styles = StyleSheet.create({
     container: {
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.surface,
+        borderRadius: BORDER_RADIUS.xl,
+        padding: SPACING.lg,
+        ...SHADOWS.md,
+        borderWidth: 1,
+        borderColor: COLORS.borderLight,
+    },
+    quizHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: SPACING.md,
     },
     title: {
-        fontWeight: '600',
-        marginBottom: 16,
-        color: '#6366F1',
+        fontSize: 18,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
+        color: COLORS.primary,
     },
     question: {
-        fontWeight: '500',
-        marginBottom: 20,
-        color: '#1F2937',
+        fontSize: 16,
+        color: COLORS.text,
+        fontWeight: TYPOGRAPHY.fontWeight.semibold,
+        marginBottom: SPACING.lg,
+        lineHeight: 22,
     },
     option: {
-        borderWidth: 1,
-        borderColor: '#E5E7EB',
-        borderRadius: 8,
-        marginBottom: 12,
-        backgroundColor: '#FAFAFA',
+        borderWidth: 2,
+        borderColor: COLORS.borderLight,
+        borderRadius: BORDER_RADIUS.lg,
+        marginBottom: SPACING.sm,
+        backgroundColor: COLORS.surfaceVariant,
     },
     correctOption: {
-        borderColor: '#10B981',
-        backgroundColor: '#D1FAE5',
+        borderColor: COLORS.success,
+        backgroundColor: COLORS.success + '10',
     },
     incorrectOption: {
-        borderColor: '#EF4444',
-        backgroundColor: '#FEE2E2',
+        borderColor: COLORS.error,
+        backgroundColor: COLORS.error + '10',
     },
     optionLabel: {
-        fontSize: 16,
+        fontSize: 15,
+        color: COLORS.textSecondary,
+        fontWeight: TYPOGRAPHY.fontWeight.medium,
     },
     button: {
-        marginTop: 16,
+        marginTop: SPACING.lg,
+        borderRadius: BORDER_RADIUS.lg,
     },
     resultContainer: {
-        marginTop: 16,
+        marginTop: SPACING.lg,
     },
     resultBadge: {
-        padding: 16,
-        borderRadius: 8,
+        padding: SPACING.lg,
+        borderRadius: BORDER_RADIUS.lg,
         alignItems: 'center',
-        marginBottom: 16,
+        marginBottom: SPACING.lg,
     },
     correctBadge: {
-        backgroundColor: '#D1FAE5',
+        backgroundColor: COLORS.success + '15',
     },
     incorrectBadge: {
-        backgroundColor: '#FEE2E2',
+        backgroundColor: COLORS.error + '15',
     },
     resultText: {
-        fontWeight: '600',
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
+        fontSize: 18,
     },
     explanationContainer: {
-        backgroundColor: '#F3F4F6',
-        padding: 16,
-        borderRadius: 8,
-        marginBottom: 16,
+        backgroundColor: COLORS.surfaceVariant,
+        padding: SPACING.lg,
+        borderRadius: BORDER_RADIUS.lg,
+        marginBottom: SPACING.lg,
+        borderWidth: 1,
+        borderColor: COLORS.borderLight,
     },
     explanationTitle: {
-        fontWeight: '600',
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
         marginBottom: 8,
-        color: '#374151',
+        color: COLORS.text,
+        fontSize: 14,
     },
     explanation: {
-        color: '#6B7280',
-        lineHeight: 22,
+        color: COLORS.textSecondary,
+        lineHeight: 20,
+        fontSize: 14,
     },
 });
 

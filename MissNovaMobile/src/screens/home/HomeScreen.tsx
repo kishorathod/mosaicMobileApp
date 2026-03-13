@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Text, TextInput, Button, ActivityIndicator } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
@@ -27,6 +28,7 @@ import {
     DIFFICULTY_LEVELS,
     COURSE_TYPES,
 } from '@/theme/theme';
+import { PlayfulButton } from '@/components/PlayfulButton';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -108,16 +110,30 @@ const HomeScreen = () => {
                     </Text>
                 </View>
                 <TouchableOpacity onPress={handleLogout} style={styles.logoutButton}>
-                    <Text style={styles.logoutText}>Logout</Text>
+                    <Icon name="logout" size={24} color={COLORS.textSecondary} />
                 </TouchableOpacity>
             </View>
 
-            <View style={styles.mascotContainer}>
-                <Text style={styles.mascot}>👩‍🏫</Text>
-                <View style={styles.speechBubble}>
-                    <Text variant="bodyLarge" style={styles.speechText}>
-                        Let's learn something new today!
-                    </Text>
+            <View style={styles.heroSection}>
+                <View style={styles.mascotWrapper}>
+                    <View style={styles.mascotCircle}>
+                        <Icon name="school" size={64} color={COLORS.primary} />
+                    </View>
+                    <View style={styles.statusBadge}>
+                        <Text style={styles.statusText}>Miss Nova is here!</Text>
+                    </View>
+                </View>
+
+                <View style={styles.speechBubbleWrapper}>
+                    <View style={styles.speechBubbleArrow} />
+                    <View style={styles.speechBubble}>
+                        <Text variant="headlineSmall" style={styles.speechGreeting}>
+                            Hi! I'm Miss Nova.
+                        </Text>
+                        <Text variant="bodyLarge" style={styles.speechSubtext}>
+                            Your AI teacher ready to create a course on any topic.
+                        </Text>
+                    </View>
                 </View>
             </View>
 
@@ -140,6 +156,8 @@ const HomeScreen = () => {
                     style={styles.input}
                     outlineColor={COLORS.border}
                     activeOutlineColor={COLORS.primary}
+                    left={<TextInput.Icon icon="auto-fix-high" color={COLORS.primary} />}
+                    theme={{ roundness: BORDER_RADIUS.md }}
                 />
 
                 <CustomPicker
@@ -170,21 +188,21 @@ const HomeScreen = () => {
                 <View style={styles.badgesContainer}>
                     {selectedCategory && (
                         <Badge
-                            emoji={selectedCategory.emoji}
+                            icon={selectedCategory.icon}
                             label={selectedCategory.label}
                             color={selectedCategory.color}
                         />
                     )}
                     {selectedDifficulty && (
                         <Badge
-                            emoji={selectedDifficulty.emoji}
+                            icon={selectedDifficulty.icon}
                             label={selectedDifficulty.label}
                             color={selectedDifficulty.color}
                         />
                     )}
                     {selectedCourseType && (
                         <Badge
-                            emoji={selectedCourseType.emoji}
+                            icon={selectedCourseType.icon}
                             label={selectedCourseType.label}
                             color={selectedCourseType.color}
                         />
@@ -193,32 +211,34 @@ const HomeScreen = () => {
 
                 {error && (
                     <View style={styles.errorContainer}>
+                        <Icon name="alert-circle" size={20} color={COLORS.error} style={{ marginRight: 8 }} />
                         <Text variant="bodySmall" style={styles.error}>
                             {error}
                         </Text>
                     </View>
                 )}
 
-                <Button
-                    mode="contained"
+                <PlayfulButton
                     onPress={handleGenerate}
                     disabled={loading || !prompt.trim() || !category}
-                    style={styles.button}
-                    contentStyle={styles.buttonContent}
-                    buttonColor={COLORS.primary}
-                    icon="sparkles">
-                    {loading ? (
-                        <ActivityIndicator color="white" />
-                    ) : (
-                        'Create My Course ✨'
-                    )}
-                </Button>
+                    loading={loading}
+                    style={styles.generateButton}>
+                    <View style={styles.buttonInner}>
+                        <Icon name="sparkles" size={24} color="#FFF" style={{ marginRight: 8 }} />
+                        <Text style={styles.buttonLabel}>
+                            {loading ? 'Creating your course...' : 'Create My Course'}
+                        </Text>
+                    </View>
+                </PlayfulButton>
             </View>
 
             <View style={styles.tipsContainer}>
-                <Text variant="titleMedium" style={styles.tipsTitle}>
-                    💡 Tips for better courses:
-                </Text>
+                <View style={styles.tipsHeader}>
+                    <Icon name="lightbulb-on" size={20} color="#92400E" />
+                    <Text variant="titleMedium" style={styles.tipsTitle}>
+                        Tips for better courses:
+                    </Text>
+                </View>
                 <Text variant="bodyMedium" style={styles.tip}>
                     • Be specific about what you want to learn
                 </Text>
@@ -242,118 +262,203 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: SPACING.lg,
+        paddingHorizontal: 24,
+        paddingTop: 16,
+        paddingBottom: 16,
         backgroundColor: COLORS.surface,
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.border,
+        marginBottom: 10,
     },
     title: {
+        fontSize: 28,
         fontWeight: TYPOGRAPHY.fontWeight.bold,
         color: COLORS.primary,
+        letterSpacing: -0.5,
     },
     welcome: {
+        fontSize: 14,
         color: COLORS.textSecondary,
-        marginTop: SPACING.xs,
+        fontWeight: TYPOGRAPHY.fontWeight.medium,
+        marginTop: 2,
     },
     logoutButton: {
-        paddingHorizontal: SPACING.md,
-        paddingVertical: SPACING.sm,
-        borderRadius: BORDER_RADIUS.sm,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
+        backgroundColor: COLORS.surfaceVariant,
+        justifyContent: 'center',
+        alignItems: 'center',
         borderWidth: 1,
-        borderColor: COLORS.border,
+        borderColor: COLORS.borderLight,
     },
     logoutText: {
         color: COLORS.textSecondary,
-        fontSize: TYPOGRAPHY.fontSize.sm,
-        fontWeight: TYPOGRAPHY.fontWeight.medium,
+        fontSize: 10,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
     },
-    mascotContainer: {
+    heroSection: {
+        flexDirection: 'row',
         alignItems: 'center',
-        padding: SPACING.xxl,
-        backgroundColor: COLORS.surface,
-        marginTop: SPACING.md,
-        marginHorizontal: SPACING.md,
-        borderRadius: BORDER_RADIUS.lg,
+        paddingHorizontal: 24,
+        marginVertical: 24,
+    },
+    mascotWrapper: {
+        position: 'relative',
+    },
+    mascotCircle: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor: '#E0F2FE', // Sky 100
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderWidth: 4,
+        borderColor: '#FFF',
         ...SHADOWS.md,
     },
-    mascot: {
-        fontSize: 80,
+    statusBadge: {
+        position: 'absolute',
+        bottom: -4,
+        right: -10,
+        backgroundColor: COLORS.secondary,
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: BORDER_RADIUS.full,
+        ...SHADOWS.sm,
+    },
+    statusText: {
+        color: '#FFF',
+        fontSize: 10,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
+    },
+    speechBubbleWrapper: {
+        flex: 1,
+        marginLeft: 20,
+        position: 'relative',
+    },
+    speechBubbleArrow: {
+        position: 'absolute',
+        left: -10,
+        top: '50%',
+        marginTop: -10,
+        width: 20,
+        height: 20,
+        backgroundColor: '#FFF',
+        transform: [{ rotate: '45deg' }],
+        borderLeftWidth: 1,
+        borderBottomWidth: 1,
+        borderColor: 'rgba(14, 165, 233, 0.2)',
     },
     speechBubble: {
-        backgroundColor: COLORS.primary,
-        padding: SPACING.md,
-        borderRadius: BORDER_RADIUS.lg,
-        marginTop: SPACING.md,
+        backgroundColor: '#FFF',
+        padding: 16,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(14, 165, 233, 0.2)',
+        ...SHADOWS.md,
     },
-    speechText: {
-        color: COLORS.surface,
-        textAlign: 'center',
-        fontWeight: TYPOGRAPHY.fontWeight.medium,
+    speechGreeting: {
+        color: COLORS.primary,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
+        fontSize: 20,
+        marginBottom: 4,
+    },
+    speechSubtext: {
+        color: COLORS.textSecondary,
+        fontSize: 14,
+        lineHeight: 18,
     },
     formContainer: {
         padding: SPACING.lg,
         backgroundColor: COLORS.surface,
-        margin: SPACING.md,
-        borderRadius: BORDER_RADIUS.lg,
-        ...SHADOWS.md,
+        marginHorizontal: SPACING.lg,
+        borderRadius: BORDER_RADIUS.xl,
+        ...SHADOWS.lg,
+        borderWidth: 1,
+        borderColor: COLORS.borderLight,
     },
     formTitle: {
-        fontWeight: TYPOGRAPHY.fontWeight.semibold,
-        marginBottom: SPACING.sm,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
+        fontSize: 22,
+        marginBottom: 8,
         color: COLORS.text,
+        letterSpacing: -0.5,
     },
     formDescription: {
         color: COLORS.textSecondary,
-        marginBottom: SPACING.lg,
-        lineHeight: TYPOGRAPHY.lineHeight.relaxed * TYPOGRAPHY.fontSize.md,
+        marginBottom: SPACING.xl,
+        fontSize: 14,
+        lineHeight: 20,
     },
     input: {
         marginBottom: SPACING.md,
         backgroundColor: COLORS.surface,
+        fontSize: 15,
+        minHeight: 48,
     },
     badgesContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        gap: SPACING.sm,
-        marginTop: SPACING.md,
-        marginBottom: SPACING.md,
+        gap: 8,
+        marginTop: SPACING.sm,
+        marginBottom: SPACING.lg,
     },
     errorContainer: {
-        backgroundColor: COLORS.error + '15',
+        backgroundColor: COLORS.error + '10',
         padding: SPACING.md,
-        borderRadius: BORDER_RADIUS.md,
-        marginBottom: SPACING.md,
+        borderRadius: BORDER_RADIUS.lg,
+        marginBottom: SPACING.lg,
+        flexDirection: 'row',
+        alignItems: 'center',
         borderWidth: 1,
-        borderColor: COLORS.error + '30',
+        borderColor: COLORS.error + '20',
     },
     error: {
         color: COLORS.error,
+        fontSize: 13,
+        fontWeight: TYPOGRAPHY.fontWeight.semibold,
+        flex: 1,
         textAlign: 'center',
-        fontWeight: TYPOGRAPHY.fontWeight.medium,
     },
-    button: {
+    generateButton: {
         marginTop: SPACING.sm,
-        borderRadius: BORDER_RADIUS.md,
     },
-    buttonContent: {
-        paddingVertical: SPACING.sm,
+    buttonInner: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    buttonLabel: {
+        color: '#FFF',
+        fontSize: 18,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
     },
     tipsContainer: {
-        padding: SPACING.lg,
-        backgroundColor: '#FEF3C7',
-        margin: SPACING.md,
+        padding: 20,
+        backgroundColor: '#fff7e6',
+        marginHorizontal: SPACING.lg,
+        marginTop: SPACING.xl,
         marginBottom: SPACING.xxl,
-        borderRadius: BORDER_RADIUS.lg,
+        borderRadius: 14,
+        borderWidth: 1,
+        borderColor: '#ffe0a3',
     },
     tipsTitle: {
-        fontWeight: TYPOGRAPHY.fontWeight.semibold,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
+        fontSize: 16,
         marginBottom: SPACING.md,
-        color: COLORS.text,
+        color: '#92400E', // Amber 800
     },
     tip: {
-        color: COLORS.textSecondary,
+        color: '#B45309', // Amber 700
         marginBottom: SPACING.sm,
-        lineHeight: TYPOGRAPHY.lineHeight.relaxed * TYPOGRAPHY.fontSize.md,
+        fontSize: 14,
+        lineHeight: 20,
+    },
+    tipsHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: SPACING.sm,
+        gap: 8,
     },
 });
 

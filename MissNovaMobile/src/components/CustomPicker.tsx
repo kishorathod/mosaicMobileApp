@@ -1,11 +1,13 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, ScrollView } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS } from '@/theme/theme';
 
 export interface PickerOption {
     value: string;
     label: string;
     emoji?: string;
+    icon?: string;
     color?: string;
 }
 
@@ -39,16 +41,18 @@ export const CustomPicker: React.FC<CustomPickerProps> = ({
                 <View style={styles.pickerContent}>
                     {selectedOption ? (
                         <>
-                            {selectedOption.emoji && (
+                            {selectedOption.icon ? (
+                                <Icon name={selectedOption.icon} size={20} color={selectedOption.color || COLORS.primary} style={styles.icon} />
+                            ) : selectedOption.emoji ? (
                                 <Text style={styles.emoji}>{selectedOption.emoji}</Text>
-                            )}
+                            ) : null}
                             <Text style={styles.selectedText}>{selectedOption.label}</Text>
                         </>
                     ) : (
                         <Text style={styles.placeholderText}>{placeholder}</Text>
                     )}
                 </View>
-                <Text style={styles.chevron}>▼</Text>
+                <Icon name="chevron-down" size={20} color={COLORS.primary} />
             </TouchableOpacity>
 
             <Modal
@@ -66,7 +70,7 @@ export const CustomPicker: React.FC<CustomPickerProps> = ({
                         <View style={styles.modalHeader}>
                             <Text style={styles.modalTitle}>{label}</Text>
                             <TouchableOpacity onPress={() => setModalVisible(false)}>
-                                <Text style={styles.closeButton}>✕</Text>
+                                <Icon name="close" size={24} color={COLORS.textTertiary} />
                             </TouchableOpacity>
                         </View>
 
@@ -83,9 +87,11 @@ export const CustomPicker: React.FC<CustomPickerProps> = ({
                                         setModalVisible(false);
                                     }}
                                 >
-                                    {option.emoji && (
+                                    {option.icon ? (
+                                        <Icon name={option.icon} size={24} color={option.color || COLORS.primary} style={styles.optionIcon} />
+                                    ) : option.emoji ? (
                                         <Text style={styles.optionEmoji}>{option.emoji}</Text>
-                                    )}
+                                    ) : null}
                                     <Text
                                         style={[
                                             styles.optionText,
@@ -95,7 +101,7 @@ export const CustomPicker: React.FC<CustomPickerProps> = ({
                                         {option.label}
                                     </Text>
                                     {value === option.value && (
-                                        <Text style={styles.checkmark}>✓</Text>
+                                        <Icon name="check-circle" size={20} color={COLORS.primary} />
                                     )}
                                 </TouchableOpacity>
                             ))}
@@ -112,21 +118,24 @@ const styles = StyleSheet.create({
         marginBottom: SPACING.md,
     },
     label: {
-        fontSize: TYPOGRAPHY.fontSize.sm,
-        fontWeight: TYPOGRAPHY.fontWeight.medium,
-        color: COLORS.text,
+        fontSize: TYPOGRAPHY.fontSize.xs,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
+        color: COLORS.textSecondary,
         marginBottom: SPACING.xs,
+        textTransform: 'uppercase',
+        letterSpacing: 0.5,
     },
     pickerButton: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         backgroundColor: COLORS.surface,
-        borderWidth: 2,
+        borderWidth: 1,
         borderColor: COLORS.border,
         borderRadius: BORDER_RADIUS.md,
-        padding: SPACING.md,
-        minHeight: 56,
+        paddingHorizontal: 16,
+        height: 48,
+        ...SHADOWS.sm,
     },
     pickerContent: {
         flexDirection: 'row',
@@ -140,26 +149,26 @@ const styles = StyleSheet.create({
     selectedText: {
         fontSize: TYPOGRAPHY.fontSize.md,
         color: COLORS.text,
-        fontWeight: TYPOGRAPHY.fontWeight.medium,
+        fontWeight: TYPOGRAPHY.fontWeight.semibold,
     },
     placeholderText: {
         fontSize: TYPOGRAPHY.fontSize.md,
         color: COLORS.textTertiary,
     },
     chevron: {
-        fontSize: TYPOGRAPHY.fontSize.xs,
-        color: COLORS.textSecondary,
+        fontSize: 10,
+        color: COLORS.primary,
     },
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: 'rgba(15, 23, 42, 0.4)',
         justifyContent: 'flex-end',
     },
     modalContent: {
         backgroundColor: COLORS.surface,
         borderTopLeftRadius: BORDER_RADIUS.xl,
         borderTopRightRadius: BORDER_RADIUS.xl,
-        maxHeight: '70%',
+        maxHeight: '80%',
         ...SHADOWS.lg,
     },
     modalHeader: {
@@ -168,47 +177,55 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         padding: SPACING.lg,
         borderBottomWidth: 1,
-        borderBottomColor: COLORS.border,
+        borderBottomColor: COLORS.borderLight,
     },
     modalTitle: {
         fontSize: TYPOGRAPHY.fontSize.lg,
-        fontWeight: TYPOGRAPHY.fontWeight.semibold,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
         color: COLORS.text,
     },
     closeButton: {
-        fontSize: TYPOGRAPHY.fontSize.xxl,
-        color: COLORS.textSecondary,
-        fontWeight: TYPOGRAPHY.fontWeight.medium,
+        fontSize: 24,
+        color: COLORS.textTertiary,
     },
     optionsList: {
-        padding: SPACING.sm,
+        padding: SPACING.md,
     },
     optionItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        padding: SPACING.md,
-        borderRadius: BORDER_RADIUS.md,
-        marginBottom: SPACING.xs,
+        padding: SPACING.lg,
+        borderRadius: BORDER_RADIUS.lg,
+        marginBottom: SPACING.sm,
+        borderWidth: 1,
+        borderColor: 'transparent',
     },
     optionItemSelected: {
-        backgroundColor: COLORS.primaryLight + '20',
+        backgroundColor: COLORS.primary + '08',
+        borderColor: COLORS.primary + '20',
     },
     optionEmoji: {
-        fontSize: TYPOGRAPHY.fontSize.xl,
+        fontSize: TYPOGRAPHY.fontSize.xxl,
+        marginRight: SPACING.md,
+    },
+    icon: {
+        marginRight: SPACING.sm,
+    },
+    optionIcon: {
         marginRight: SPACING.md,
     },
     optionText: {
         flex: 1,
         fontSize: TYPOGRAPHY.fontSize.md,
-        color: COLORS.text,
+        color: COLORS.textSecondary,
+        fontWeight: TYPOGRAPHY.fontWeight.medium,
     },
     optionTextSelected: {
-        fontWeight: TYPOGRAPHY.fontWeight.semibold,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
         color: COLORS.primary,
     },
     checkmark: {
-        fontSize: TYPOGRAPHY.fontSize.lg,
+        fontSize: 16,
         color: COLORS.primary,
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
     },
 });

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { courseAPI, Course, AudioCourse, VideoCourse } from '@/api/client';
 
-export type { Course } from '@/api/client';
+export type { Course, Quiz } from '@/api/client';
 
 export interface AudioCourseData extends AudioCourse {
     type: 'audio';

@@ -1,4 +1,4 @@
-package com.tempapp
+package com.missnova.mobile
 
 import android.app.Application
 import com.facebook.react.PackageList

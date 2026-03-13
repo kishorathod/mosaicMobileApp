@@ -3,6 +3,7 @@ import { View, StyleSheet, ScrollView, TouchableOpacity, Dimensions } from 'reac
 import { Text, Button, ProgressBar, Card, IconButton } from 'react-native-paper';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS } from '@/theme/theme';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const { width } = Dimensions.get('window');
 
@@ -55,12 +56,9 @@ const VideoCourseScreen = () => {
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <IconButton
-                    icon="arrow-left"
-                    size={24}
-                    onPress={() => navigation.goBack()}
-                    iconColor={COLORS.text}
-                />
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Icon name="arrow-left" size={24} color={COLORS.text} />
+                </TouchableOpacity>
                 <Text variant="titleLarge" style={styles.headerTitle}>
                     Video Course
                 </Text>
@@ -73,9 +71,7 @@ const VideoCourseScreen = () => {
                     <View style={styles.videoContainer}>
                         {/* Video Placeholder */}
                         <View style={styles.videoPlaceholder}>
-                            <Text style={styles.videoPlaceholderText}>
-                                🎬 Video Player
-                            </Text>
+                            <Icon name="play-circle" size={80} color={COLORS.surface} style={{ marginBottom: SPACING.md }} />
                             <Text style={styles.videoPlaceholderSubtext}>
                                 {course.title}
                             </Text>
@@ -147,9 +143,12 @@ const VideoCourseScreen = () => {
                 {course.transcript && (
                     <Card style={styles.transcriptCard}>
                         <Card.Content>
-                            <Text variant="titleMedium" style={styles.transcriptTitle}>
-                                📝 Transcript
-                            </Text>
+                            <View style={styles.transcriptHeader}>
+                                <Icon name="text-box-outline" size={20} color={COLORS.text} style={{ marginRight: 8 }} />
+                                <Text variant="titleMedium" style={styles.transcriptTitle}>
+                                    Transcript
+                                </Text>
+                            </View>
                             <Text variant="bodyMedium" style={styles.transcriptText}>
                                 {course.transcript}
                             </Text>
@@ -161,7 +160,7 @@ const VideoCourseScreen = () => {
                 <Card style={styles.noteCard}>
                     <Card.Content>
                         <Text variant="bodyMedium" style={styles.noteText}>
-                            ℹ️ Video playback functionality will be implemented with react-native-video
+                            Video playback functionality will be implemented soon
                         </Text>
                     </Card.Content>
                 </Card>
@@ -179,21 +178,34 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: SPACING.md,
+        paddingHorizontal: 24,
+        paddingTop: 16,
+        paddingBottom: 16,
         backgroundColor: COLORS.surface,
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.border,
+        ...SHADOWS.sm,
+        marginBottom: 10,
+    },
+    backButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: COLORS.surfaceVariant,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     headerTitle: {
-        fontWeight: TYPOGRAPHY.fontWeight.semibold,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
         color: COLORS.text,
+        fontSize: 18,
     },
     content: {
         flex: 1,
     },
     videoCard: {
         margin: 0,
-        backgroundColor: COLORS.surface,
+        backgroundColor: '#000',
+        borderRadius: 0,
+        ...SHADOWS.lg,
     },
     videoContainer: {
         width: '100%',
@@ -205,39 +217,41 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: '#1a1a1a',
+        backgroundColor: '#0F172A',
     },
     videoPlaceholderText: {
-        fontSize: TYPOGRAPHY.fontSize.xxl,
+        fontSize: 48,
         color: COLORS.surface,
-        marginBottom: SPACING.sm,
+        marginBottom: SPACING.md,
     },
     videoPlaceholderSubtext: {
-        fontSize: TYPOGRAPHY.fontSize.md,
+        fontSize: 16,
         color: COLORS.textTertiary,
         textAlign: 'center',
-        paddingHorizontal: SPACING.lg,
+        paddingHorizontal: SPACING.xxl,
+        fontWeight: '500',
     },
     controlsOverlay: {
         ...StyleSheet.absoluteFillObject,
         justifyContent: 'center',
         alignItems: 'center',
+        backgroundColor: 'rgba(15, 23, 42, 0.3)',
     },
     playButtonOverlay: {
         width: 80,
         height: 80,
         borderRadius: 40,
-        backgroundColor: 'rgba(99, 102, 241, 0.9)',
+        backgroundColor: COLORS.primary + 'CC',
         justifyContent: 'center',
         alignItems: 'center',
         ...SHADOWS.lg,
     },
     fullscreenButton: {
         position: 'absolute',
-        bottom: SPACING.md,
-        right: SPACING.md,
+        bottom: SPACING.lg,
+        right: SPACING.lg,
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
-        borderRadius: BORDER_RADIUS.sm,
+        borderRadius: BORDER_RADIUS.md,
     },
     progressContainer: {
         flexDirection: 'row',
@@ -248,67 +262,96 @@ const styles = StyleSheet.create({
         flex: 1,
         marginHorizontal: SPACING.md,
         height: 6,
-        borderRadius: BORDER_RADIUS.sm,
+        borderRadius: BORDER_RADIUS.full,
+        backgroundColor: 'rgba(255, 255, 255, 0.2)',
     },
     timeText: {
-        fontSize: TYPOGRAPHY.fontSize.sm,
-        color: COLORS.textSecondary,
-        fontWeight: TYPOGRAPHY.fontWeight.medium,
+        fontSize: 12,
+        color: COLORS.surface,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
+        width: 45,
+        textAlign: 'center',
     },
     additionalControls: {
         flexDirection: 'row',
         justifyContent: 'center',
         marginTop: SPACING.md,
+        paddingBottom: SPACING.md,
     },
     speedButton: {
-        paddingHorizontal: SPACING.lg,
-        paddingVertical: SPACING.sm,
-        borderRadius: BORDER_RADIUS.md,
-        backgroundColor: COLORS.surfaceVariant,
+        paddingHorizontal: SPACING.xl,
+        paddingVertical: 6,
+        borderRadius: BORDER_RADIUS.full,
+        backgroundColor: 'rgba(255, 255, 255, 0.1)',
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.2)',
     },
     speedText: {
-        fontSize: TYPOGRAPHY.fontSize.md,
-        fontWeight: TYPOGRAPHY.fontWeight.semibold,
-        color: COLORS.primary,
+        fontSize: 12,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
+        color: COLORS.surface,
+        letterSpacing: 1,
     },
     infoCard: {
-        margin: SPACING.md,
+        margin: SPACING.lg,
+        padding: SPACING.lg,
         backgroundColor: COLORS.surface,
+        borderRadius: BORDER_RADIUS.xl,
         ...SHADOWS.md,
+        borderWidth: 1,
+        borderColor: COLORS.borderLight,
     },
     courseTitle: {
         fontWeight: TYPOGRAPHY.fontWeight.bold,
-        color: COLORS.primary,
+        color: COLORS.text,
+        fontSize: 24,
+        letterSpacing: -0.5,
         marginBottom: SPACING.md,
     },
     description: {
         color: COLORS.textSecondary,
-        lineHeight: TYPOGRAPHY.lineHeight.relaxed * TYPOGRAPHY.fontSize.lg,
+        lineHeight: 24,
+        fontSize: 16,
     },
     transcriptCard: {
-        margin: SPACING.md,
-        marginTop: 0,
+        marginHorizontal: SPACING.lg,
+        marginBottom: SPACING.lg,
+        padding: SPACING.lg,
+        borderRadius: BORDER_RADIUS.xl,
         backgroundColor: COLORS.surface,
         ...SHADOWS.md,
+        borderWidth: 1,
+        borderColor: COLORS.borderLight,
+    },
+    transcriptHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: SPACING.md,
     },
     transcriptTitle: {
-        fontWeight: TYPOGRAPHY.fontWeight.semibold,
-        marginBottom: SPACING.md,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
         color: COLORS.text,
+        fontSize: 18,
     },
     transcriptText: {
         color: COLORS.textSecondary,
-        lineHeight: TYPOGRAPHY.lineHeight.relaxed * TYPOGRAPHY.fontSize.md,
+        lineHeight: 24,
+        fontSize: 15,
     },
     noteCard: {
-        margin: SPACING.md,
-        marginTop: 0,
+        marginHorizontal: SPACING.lg,
         marginBottom: SPACING.xxl,
-        backgroundColor: '#E0F2FE',
+        padding: SPACING.md,
+        borderRadius: BORDER_RADIUS.lg,
+        backgroundColor: COLORS.info + '10',
+        borderWidth: 1,
+        borderColor: COLORS.info + '20',
     },
     noteText: {
-        color: '#0369A1',
+        color: COLORS.info,
         textAlign: 'center',
+        fontSize: 12,
+        fontWeight: '500',
     },
 });
 

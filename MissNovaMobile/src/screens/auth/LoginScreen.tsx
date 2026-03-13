@@ -13,6 +13,7 @@ import { login, clearError } from '@/store/slices/authSlice';
 import { AppDispatch, RootState } from '@/store';
 import type { StackNavigationProp } from '@react-navigation/stack';
 import type { RootStackParamList } from '@/navigation/AppNavigator';
+import { COLORS, BORDER_RADIUS, SHADOWS } from '@/theme/theme';
 
 type LoginScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Login'>;
 
@@ -105,7 +106,7 @@ const LoginScreen = () => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#fff',
+        backgroundColor: COLORS.background,
     },
     scrollContent: {
         flexGrow: 1,
@@ -114,35 +115,50 @@ const styles = StyleSheet.create({
     },
     header: {
         alignItems: 'center',
-        marginBottom: 32,
+        marginBottom: 40,
     },
     title: {
         fontWeight: 'bold',
-        color: '#6366F1',
+        color: COLORS.primary,
+        fontSize: 32,
         marginBottom: 8,
+        letterSpacing: -1,
     },
     subtitle: {
-        fontWeight: '600',
+        fontWeight: '700',
+        fontSize: 24,
+        color: COLORS.text,
         marginBottom: 8,
     },
     description: {
-        color: '#666',
+        color: COLORS.textSecondary,
+        fontSize: 16,
     },
     form: {
         gap: 16,
+        backgroundColor: COLORS.surface,
+        padding: 24,
+        borderRadius: BORDER_RADIUS.xl,
+        ...SHADOWS.lg,
+        borderWidth: 1,
+        borderColor: COLORS.borderLight,
     },
     input: {
         marginBottom: 8,
+        backgroundColor: COLORS.surface,
+        height: 48,
     },
     button: {
         marginTop: 8,
+        borderRadius: BORDER_RADIUS.lg,
     },
     buttonContent: {
-        paddingVertical: 8,
+        height: 56,
     },
     error: {
-        color: '#EF4444',
+        color: COLORS.error,
         textAlign: 'center',
+        fontWeight: '600',
     },
 });
 

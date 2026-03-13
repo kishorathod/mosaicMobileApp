@@ -3,6 +3,7 @@ import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Text, Button, ProgressBar, Card, IconButton } from 'react-native-paper';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS } from '@/theme/theme';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 interface AudioCourse {
     title: string;
@@ -52,12 +53,9 @@ const AudioCourseScreen = () => {
         <View style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <IconButton
-                    icon="arrow-left"
-                    size={24}
-                    onPress={() => navigation.goBack()}
-                    iconColor={COLORS.text}
-                />
+                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                    <Icon name="arrow-left" size={24} color={COLORS.text} />
+                </TouchableOpacity>
                 <Text variant="titleLarge" style={styles.headerTitle}>
                     Audio Course
                 </Text>
@@ -68,9 +66,12 @@ const AudioCourseScreen = () => {
                 {/* Course Info */}
                 <Card style={styles.infoCard}>
                     <Card.Content>
-                        <Text variant="displaySmall" style={styles.courseTitle}>
-                            🎧 {course.title}
-                        </Text>
+                        <View style={styles.titleContainer}>
+                            <Icon name="headphones" size={32} color={COLORS.primary} style={{ marginRight: 12 }} />
+                            <Text variant="headlineSmall" style={styles.courseTitle}>
+                                {course.title}
+                            </Text>
+                        </View>
                         <Text variant="bodyLarge" style={styles.description}>
                             {course.description}
                         </Text>
@@ -82,8 +83,9 @@ const AudioCourseScreen = () => {
                     <Card.Content>
                         {/* Waveform Visualization Placeholder */}
                         <View style={styles.waveformContainer}>
+                            <Icon name="sine-wave" size={48} color={COLORS.primary} />
                             <Text style={styles.waveformPlaceholder}>
-                                🎵 Audio Waveform
+                                AUDIO WAVEFORM
                             </Text>
                         </View>
 
@@ -142,9 +144,12 @@ const AudioCourseScreen = () => {
                 {course.transcript && (
                     <Card style={styles.transcriptCard}>
                         <Card.Content>
-                            <Text variant="titleMedium" style={styles.transcriptTitle}>
-                                📝 Transcript
-                            </Text>
+                            <View style={styles.transcriptHeader}>
+                                <Icon name="text-box-outline" size={20} color={COLORS.text} style={{ marginRight: 8 }} />
+                                <Text variant="titleMedium" style={styles.transcriptTitle}>
+                                    Transcript
+                                </Text>
+                            </View>
                             <Text variant="bodyMedium" style={styles.transcriptText}>
                                 {course.transcript}
                             </Text>
@@ -156,7 +161,7 @@ const AudioCourseScreen = () => {
                 <Card style={styles.noteCard}>
                     <Card.Content>
                         <Text variant="bodyMedium" style={styles.noteText}>
-                            ℹ️ Audio playback functionality will be implemented with react-native-track-player
+                            Audio playback functionality will be implemented soon
                         </Text>
                     </Card.Content>
                 </Card>
@@ -174,120 +179,173 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: SPACING.md,
+        paddingHorizontal: 24,
+        paddingTop: 16,
+        paddingBottom: 16,
         backgroundColor: COLORS.surface,
-        borderBottomWidth: 1,
-        borderBottomColor: COLORS.border,
+        ...SHADOWS.sm,
+        marginBottom: 10,
+    },
+    backButton: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: COLORS.surfaceVariant,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     headerTitle: {
-        fontWeight: TYPOGRAPHY.fontWeight.semibold,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
         color: COLORS.text,
+        fontSize: 18,
     },
     content: {
         flex: 1,
     },
     infoCard: {
-        margin: SPACING.md,
+        margin: SPACING.lg,
+        padding: SPACING.lg,
         backgroundColor: COLORS.surface,
+        borderRadius: BORDER_RADIUS.xl,
         ...SHADOWS.md,
+        borderWidth: 1,
+        borderColor: COLORS.borderLight,
+    },
+    titleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: SPACING.md,
     },
     courseTitle: {
         fontWeight: TYPOGRAPHY.fontWeight.bold,
         color: COLORS.primary,
-        marginBottom: SPACING.md,
+        fontSize: 24,
+        letterSpacing: -0.5,
+        flex: 1,
     },
     description: {
         color: COLORS.textSecondary,
-        lineHeight: TYPOGRAPHY.lineHeight.relaxed * TYPOGRAPHY.fontSize.lg,
+        lineHeight: 24,
+        fontSize: 16,
     },
     playerCard: {
-        margin: SPACING.md,
-        marginTop: 0,
+        marginHorizontal: SPACING.lg,
+        marginBottom: SPACING.lg,
+        padding: SPACING.lg,
         backgroundColor: COLORS.surface,
+        borderRadius: BORDER_RADIUS.xl,
         ...SHADOWS.lg,
+        borderWidth: 1,
+        borderColor: COLORS.borderLight,
     },
     waveformContainer: {
-        height: 120,
-        backgroundColor: COLORS.surfaceVariant,
-        borderRadius: BORDER_RADIUS.md,
+        height: 100,
+        backgroundColor: COLORS.primary + '05',
+        borderRadius: BORDER_RADIUS.lg,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: SPACING.lg,
+        marginBottom: SPACING.xl,
+        borderWidth: 1,
+        borderStyle: 'dashed',
+        borderColor: COLORS.primary + '20',
     },
     waveformPlaceholder: {
-        fontSize: TYPOGRAPHY.fontSize.xl,
-        color: COLORS.textTertiary,
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: COLORS.primary,
+        letterSpacing: 2,
     },
     progressContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: SPACING.lg,
+        marginBottom: SPACING.xl,
     },
     progressBar: {
         flex: 1,
         marginHorizontal: SPACING.md,
-        height: 6,
-        borderRadius: BORDER_RADIUS.sm,
+        height: 8,
+        borderRadius: BORDER_RADIUS.full,
+        backgroundColor: COLORS.surfaceVariant,
     },
     timeText: {
-        fontSize: TYPOGRAPHY.fontSize.sm,
+        fontSize: 12,
         color: COLORS.textSecondary,
-        fontWeight: TYPOGRAPHY.fontWeight.medium,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
+        width: 45,
+        textAlign: 'center',
     },
     controls: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: SPACING.md,
+        marginBottom: SPACING.xl,
     },
     playButton: {
-        width: 72,
-        height: 72,
-        borderRadius: 36,
+        width: 80,
+        height: 80,
+        borderRadius: 40,
         backgroundColor: COLORS.primary,
         justifyContent: 'center',
         alignItems: 'center',
-        marginHorizontal: SPACING.lg,
+        marginHorizontal: SPACING.xl,
         ...SHADOWS.lg,
     },
     speedControl: {
         alignItems: 'center',
     },
     speedButton: {
-        paddingHorizontal: SPACING.lg,
+        paddingHorizontal: SPACING.xl,
         paddingVertical: SPACING.sm,
-        borderRadius: BORDER_RADIUS.md,
+        borderRadius: BORDER_RADIUS.full,
         backgroundColor: COLORS.surfaceVariant,
+        borderWidth: 1,
+        borderColor: COLORS.border,
     },
     speedText: {
-        fontSize: TYPOGRAPHY.fontSize.md,
-        fontWeight: TYPOGRAPHY.fontWeight.semibold,
-        color: COLORS.primary,
+        fontSize: 14,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
+        color: COLORS.textSecondary,
+        letterSpacing: 1,
     },
     transcriptCard: {
-        margin: SPACING.md,
-        marginTop: 0,
+        marginHorizontal: SPACING.lg,
+        marginBottom: SPACING.lg,
+        padding: SPACING.lg,
         backgroundColor: COLORS.surface,
+        borderRadius: BORDER_RADIUS.xl,
         ...SHADOWS.md,
+        borderWidth: 1,
+        borderColor: COLORS.borderLight,
+    },
+    transcriptHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: SPACING.md,
     },
     transcriptTitle: {
-        fontWeight: TYPOGRAPHY.fontWeight.semibold,
-        marginBottom: SPACING.md,
+        fontWeight: TYPOGRAPHY.fontWeight.bold,
         color: COLORS.text,
+        fontSize: 18,
     },
     transcriptText: {
         color: COLORS.textSecondary,
-        lineHeight: TYPOGRAPHY.lineHeight.relaxed * TYPOGRAPHY.fontSize.md,
+        lineHeight: 24,
+        fontSize: 15,
     },
     noteCard: {
-        margin: SPACING.md,
-        marginTop: 0,
+        marginHorizontal: SPACING.lg,
         marginBottom: SPACING.xxl,
-        backgroundColor: '#E0F2FE',
+        padding: SPACING.md,
+        borderRadius: BORDER_RADIUS.lg,
+        backgroundColor: COLORS.info + '10',
+        borderWidth: 1,
+        borderColor: COLORS.info + '20',
     },
     noteText: {
-        color: '#0369A1',
+        color: COLORS.info,
         textAlign: 'center',
+        fontSize: 12,
+        fontWeight: '500',
     },
 });
 

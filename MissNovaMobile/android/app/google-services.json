@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "579948442637",
+    "project_id": "miss-nova-mobile",
+    "storage_bucket": "miss-nova-mobile.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:579948442637:android:402994cd7ac6e7eac79144",
+        "android_client_info": {
+          "package_name": "com.missnova.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCdSjZG6hkmDgZY-2LmueeuU1Kjf2Tm34w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
