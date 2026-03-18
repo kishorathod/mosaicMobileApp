@@ -36,6 +36,7 @@ jobs:
       - name: Build Android Release APK
         run: |
           cd MissNovaMobile/android
+          chmod +x gradlew
           ./gradlew assembleRelease
         env:
           MYAPP_RELEASE_STORE_FILE: debug.keystore
