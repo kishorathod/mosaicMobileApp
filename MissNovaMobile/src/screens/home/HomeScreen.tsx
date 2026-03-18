@@ -38,6 +38,7 @@ import {
 } from '@/theme/theme';
 import { PlayfulButton } from '@/components/PlayfulButton';
 import { useAppSelector } from '@/store/hooks';
+import { DEGREES } from '@/constants/degrees';
 
 type HomeScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Home'>;
 
@@ -48,7 +49,9 @@ const HomeScreen = () => {
         (state: RootState) => state.course
     );
     const { user } = useSelector((state: RootState) => state.auth);
-    const { totalXP, rank } = useAppSelector((state: RootState) => state.gamification);
+    const { totalXP, rank, enrolledDegrees } = useAppSelector((state: RootState) => state.gamification);
+
+    const enrolledPaths = DEGREES.filter(degree => enrolledDegrees.includes(degree.id));
 
     const [prompt, setPrompt] = useState('');
     const [menuVisible, setMenuVisible] = useState(false);
@@ -136,7 +139,7 @@ const HomeScreen = () => {
             category: 'Technology',
             categoryColor: '#E0F2FE',
             accentColor: '#0369A1',
-            icon: 'application-brackets-outline',
+            icon: 'code-braces',
             difficulty: 'Intermediate',
             type: 'slides'
         },
@@ -160,7 +163,7 @@ const HomeScreen = () => {
             category: 'Design',
             categoryColor: '#DCFCE7',
             accentColor: '#15803D',
-            icon: 'drawing-variant',
+            icon: 'palette-swatch-outline',
             difficulty: 'Intermediate',
             type: 'video'
         }
@@ -260,6 +263,14 @@ const HomeScreen = () => {
                             )}
                             titleStyle={{ color: '#111827', fontWeight: '500' }}
                         />
+                        <Menu.Item 
+                            onPress={() => { closeMenu(); navigation.navigate('AIAssistant'); }} 
+                            title="Chat with Miss Nova" 
+                            leadingIcon={({ size, color }) => (
+                                <Icon name="chat-processing" size={size} color="#1DA1F2" />
+                            )}
+                            titleStyle={{ color: '#111827', fontWeight: '500' }}
+                        />
                         <Divider />
                         <Menu.Item 
                             onPress={handleLogoutWithMenu} 
@@ -275,15 +286,25 @@ const HomeScreen = () => {
 
 
 
-            <View style={styles.assistantBanner}>
+            <TouchableOpacity 
+                style={styles.assistantBanner}
+                onPress={() => navigation.navigate('AIAssistant')}
+                activeOpacity={0.9}
+            >
                 <View style={styles.bannerAvatar}>
                     <MascotSvg width={60} height={60} />
                 </View>
                 <View style={styles.bannerTextContainer}>
-                    <Text style={styles.bannerTitle}>Hi! I'm Miss Nova.</Text>
+                    <View style={styles.bannerHeader}>
+                        <Text style={styles.bannerTitle}>Hi! I'm Miss Nova.</Text>
+                        <View style={styles.chatBadge}>
+                            <Icon name="chat-outline" size={12} color="#1DA1F2" style={{ marginRight: 4 }} />
+                            <Text style={styles.chatBadgeText}>TAP TO CHAT</Text>
+                        </View>
+                    </View>
                     <Text style={styles.bannerSubtext}>Your AI teacher ready to create a course on any topic.</Text>
                 </View>
-            </View>
+            </TouchableOpacity>
 
             <TouchableOpacity 
                 style={styles.degreesCard} 
@@ -391,13 +412,52 @@ const HomeScreen = () => {
                             <ActivityIndicator color="white" />
                         ) : (
                             <View style={styles.buttonInnerContent}>
-                                <Icon name="sparkles" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
+                                <Icon name="creation" size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
                                 <Text style={styles.buttonLabel}>Create My Course</Text>
                             </View>
                         )}
                     </View>
                 </TouchableOpacity>
             </View>
+
+            {enrolledPaths.length > 0 && (
+                <View style={styles.continueSection}>
+                    <View style={styles.sectionHeader}>
+                        <Text style={styles.sectionTitle}>Continue Learning</Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('Degrees')}>
+                            <Text style={styles.viewAllText}>Manage Paths</Text>
+                        </TouchableOpacity>
+                    </View>
+                    <ScrollView 
+                        horizontal={true} 
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.continueScrollContainer}
+                    >
+                        {enrolledPaths.map((path) => (
+                            <TouchableOpacity 
+                                key={path.id}
+                                style={styles.enrolledPathCard}
+                                activeOpacity={0.9}
+                                onPress={() => navigation.navigate('Degrees')} // Or specific path detail if implemented
+                            >
+                                <View style={[styles.pathIconContainer, { backgroundColor: path.color + '1A' }]}>
+                                    <Icon name={path.icon} size={24} color={path.color} />
+                                </View>
+                                <View style={styles.pathInfo}>
+                                    <Text style={styles.pathTitle} numberOfLines={1}>{path.title}</Text>
+                                    <View style={styles.pathProgressRow}>
+                                        <View style={styles.miniProgressBar}>
+                                            <View style={[styles.miniProgressFill, { width: '35%', backgroundColor: path.color }]} />
+                                        </View>
+                                        <Text style={styles.pathProgressText}>35%</Text>
+                                    </View>
+                                </View>
+                                <Icon name="chevron-right" size={20} color="#CBD5E1" />
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                </View>
+            )}
 
             <View style={styles.exploreSection}>
                 <Text style={styles.exploreTitle}>Explore Courses</Text>
@@ -460,7 +520,7 @@ const HomeScreen = () => {
                     style={styles.viewAllButton}
                     onPress={() => navigation.navigate('Degrees')}
                 >
-                    <Text style={styles.viewAllText}>View All Courses</Text>
+                    <Text style={styles.viewAllCoursesText}>View All Courses</Text>
                     <Icon name="chevron-right" size={20} color="#1DA1F2" />
                 </TouchableOpacity>
             </View>
@@ -581,6 +641,27 @@ const styles = StyleSheet.create({
         padding: 16,
         borderRadius: 16,
         ...SHADOWS.sm,
+    },
+    bannerHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
+    chatBadge: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#F0F9FF',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#E0F2FE',
+    },
+    chatBadgeText: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: '#1DA1F2',
     },
     bannerAvatar: {
         width: 80,
@@ -720,6 +801,79 @@ const styles = StyleSheet.create({
     exploreSection: {
         marginTop: 40,
         marginBottom: 16,
+    },
+    continueSection: {
+        paddingHorizontal: 20,
+        marginBottom: 32,
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#1E293B',
+    },
+    viewAllText: {
+        fontSize: 14,
+        color: '#1DA1F2',
+        fontWeight: '500',
+    },
+    continueScrollContainer: {
+        paddingRight: 20,
+    },
+    enrolledPathCard: {
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        padding: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        width: 280,
+        marginRight: 16,
+        ...SHADOWS.sm,
+        borderWidth: 1,
+        borderColor: '#F1F5F9',
+    },
+    pathIconContainer: {
+        width: 48,
+        height: 48,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginRight: 12,
+    },
+    pathInfo: {
+        flex: 1,
+        marginRight: 8,
+    },
+    pathTitle: {
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#1E293B',
+        marginBottom: 4,
+    },
+    pathProgressRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    miniProgressBar: {
+        flex: 1,
+        height: 4,
+        backgroundColor: '#F1F5F9',
+        borderRadius: 2,
+        marginRight: 8,
+    },
+    miniProgressFill: {
+        height: '100%',
+        borderRadius: 2,
+    },
+    pathProgressText: {
+        fontSize: 11,
+        fontWeight: '600',
+        color: '#64748B',
     },
     exploreTitle: {
         fontSize: 20,
@@ -876,7 +1030,7 @@ const styles = StyleSheet.create({
         borderColor: '#E2E8F0',
         ...SHADOWS.sm,
     },
-    viewAllText: {
+    viewAllCoursesText: {
         fontSize: 15,
         fontWeight: 'bold',
         color: '#1DA1F2',

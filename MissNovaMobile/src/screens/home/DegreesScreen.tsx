@@ -4,52 +4,24 @@ import { Text, Card } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useNavigation } from '@react-navigation/native';
 import { COLORS, SHADOWS, TYPOGRAPHY } from '@/theme/theme';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { RootState } from '@/store';
+import { enrollInDegree } from '@/store/slices/gamificationSlice';
+import { DEGREES } from '@/constants/degrees';
 
-const DEGREES = [
-    {
-        id: '1',
-        title: 'Full Stack Web Developer',
-        courses: 12,
-        duration: '6 Months',
-        difficulty: 'Intermediate',
-        icon: 'code-braces',
-        color: '#3B82F6',
-        description: 'Master both frontend and backend technologies to build complete web applications.',
-    },
-    {
-        id: '2',
-        title: 'AI & Machine Learning Specialist',
-        courses: 15,
-        duration: '9 Months',
-        difficulty: 'Advanced',
-        icon: 'brain',
-        color: '#8B5CF6',
-        description: 'Dive deep into neural networks, data science, and the future of agentic AI.',
-    },
-    {
-        id: '3',
-        title: 'Blockchain Engineer',
-        courses: 8,
-        duration: '4 Months',
-        difficulty: 'Advanced',
-        icon: 'link-variant',
-        color: '#10B981',
-        description: 'Learn to build decentralized applications and smart contracts on EduChain.',
-    },
-    {
-        id: '4',
-        title: 'UI/UX Design Master',
-        courses: 10,
-        duration: '5 Months',
-        difficulty: 'Beginner',
-        icon: 'palette',
-        color: '#F59E0B',
-        description: 'Create stunning user interfaces and research-backed user experiences.',
-    },
-];
+
 
 const DegreesScreen = () => {
-    const navigation = useNavigation();
+    const navigation = useNavigation() as any;
+    const dispatch = useAppDispatch();
+    const { user } = useAppSelector((state: RootState) => state.auth);
+    const { enrolledDegrees } = useAppSelector((state: RootState) => state.gamification);
+
+    const handleEnroll = (degreeId: string) => {
+        if (user) {
+            dispatch(enrollInDegree({ uid: user.uid, degreeId }));
+        }
+    };
 
     return (
         <View style={styles.container}>
@@ -72,40 +44,49 @@ const DegreesScreen = () => {
                     </Text>
                 </View>
 
-                {DEGREES.map((degree) => (
-                    <TouchableOpacity key={degree.id} style={styles.degreeCard} activeOpacity={0.9}>
-                        <View style={[styles.iconContainer, { backgroundColor: degree.color + '1A' }]}>
-                            <Icon name={degree.icon} size={32} color={degree.color} />
-                        </View>
-                        
-                        <View style={styles.degreeInfo}>
-                            <Text style={styles.degreeTitle}>{degree.title}</Text>
-                            <Text style={styles.degreeDescription}>{degree.description}</Text>
-                            
-                            <View style={styles.statsRow}>
-                                <View style={styles.stat}>
-                                    <Icon name="book-open-variant" size={14} color="#64748B" />
-                                    <Text style={styles.statText}>{degree.courses} Courses</Text>
-                                </View>
-                                <View style={styles.stat}>
-                                    <Icon name="clock-outline" size={14} color="#64748B" />
-                                    <Text style={styles.statText}>{degree.duration}</Text>
-                                </View>
-                                <View style={styles.stat}>
-                                    <Icon name="trending-up" size={14} color="#64748B" />
-                                    <Text style={styles.statText}>{degree.difficulty}</Text>
-                                </View>
+                {DEGREES.map((degree) => {
+                    const isEnrolled = enrolledDegrees.includes(degree.id);
+                    return (
+                        <TouchableOpacity key={degree.id} style={styles.degreeCard} activeOpacity={0.9}>
+                            <View style={[styles.iconContainer, { backgroundColor: degree.color + '1A' }]}>
+                                <Icon name={degree.icon} size={32} color={degree.color} />
                             </View>
+                            
+                            <View style={styles.degreeInfo}>
+                                <Text style={styles.degreeTitle}>{degree.title}</Text>
+                                <Text style={styles.degreeDescription}>{degree.description}</Text>
+                                
+                                <View style={styles.statsRow}>
+                                    <View style={styles.stat}>
+                                        <Icon name="book-open-variant" size={14} color="#64748B" />
+                                        <Text style={styles.statText}>{degree.courses} Courses</Text>
+                                    </View>
+                                    <View style={styles.stat}>
+                                        <Icon name="clock-outline" size={14} color="#64748B" />
+                                        <Text style={styles.statText}>{degree.duration}</Text>
+                                    </View>
+                                    <View style={styles.stat}>
+                                        <Icon name="trending-up" size={14} color="#64748B" />
+                                        <Text style={styles.statText}>{degree.difficulty}</Text>
+                                    </View>
+                                </View>
 
-                            <TouchableOpacity 
-                                style={[styles.enrollButton, { backgroundColor: degree.color }]}
-                            >
-                                <Text style={styles.enrollButtonText}>Enroll Path</Text>
-                                <Icon name="chevron-right" size={16} color="#FFFFFF" />
-                            </TouchableOpacity>
-                        </View>
-                    </TouchableOpacity>
-                ))}
+                                <TouchableOpacity 
+                                    style={[
+                                        styles.enrollButton, 
+                                        { backgroundColor: isEnrolled ? '#F0F9FF' : degree.color, borderWidth: isEnrolled ? 1 : 0, borderColor: '#E0F2FE' }
+                                    ]}
+                                    onPress={() => !isEnrolled && handleEnroll(degree.id)}
+                                >
+                                    <Text style={[styles.enrollButtonText, { color: isEnrolled ? '#0EA5E9' : '#FFFFFF' }]}>
+                                        {isEnrolled ? 'Continue Learning' : 'Enroll Path'}
+                                    </Text>
+                                    <Icon name={isEnrolled ? "play-circle-outline" : "chevron-right"} size={16} color={isEnrolled ? '#0EA5E9' : '#FFFFFF'} />
+                                </TouchableOpacity>
+                            </View>
+                        </TouchableOpacity>
+                    );
+                })}
             </ScrollView>
         </View>
     );

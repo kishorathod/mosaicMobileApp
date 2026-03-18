@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Text } from 'react-native-paper';
+import { Text, ActivityIndicator } from 'react-native-paper';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import Markdown from 'react-native-markdown-display';
@@ -18,30 +18,41 @@ const CourseScreen = () => {
     const route = useRoute();
     const navigation = useNavigation() as any;
     const dispatch = useAppDispatch();
-    const { course } = route.params as { course: any };
+    const { course } = (route.params as { course: any }) || { course: null };
 
     useEffect(() => {
-        // Cast Course to SlideCourseData and set it
-        const slideCourse = { ...course, type: 'slides' } as SlideCourseData;
-        dispatch(setCurrentCourse(slideCourse));
+        if (course) {
+            // Cast Course to SlideCourseData and set it
+            const slideCourse = { ...course, type: 'slides' } as SlideCourseData;
+            dispatch(setCurrentCourse(slideCourse));
+        }
     }, [course, dispatch]);
 
     const currentCourse = useAppSelector((state: RootState) => state.course.currentCourse) as SlideCourseData | null;
     const { leaderboard } = useAppSelector((state: RootState) => state.gamification);
     
     // Get my rank from leaderboard for this course (mocked)
-    const myRank = leaderboard.find((l: LeaderboardEntry) => l.isMe)?.rank || 5;
+    const myRank = leaderboard?.find((l: LeaderboardEntry) => l.isMe)?.rank || 5;
     const coursePoints = currentCourse?.slides ? currentCourse.slides.length * 100 : 0;
 
     const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
     const [quizCompleted, setQuizCompleted] = useState(false);
     const [leaderboardVisible, setLeaderboardVisible] = useState(false);
     const scrollViewRef = useRef<ScrollView>(null);
+    const { user } = useAppSelector((state: RootState) => state.auth);
 
-    if (!currentCourse) {
+    if (!course || !currentCourse) {
         return (
             <View style={styles.container}>
-                <Text>Loading course...</Text>
+                <View style={styles.header}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <Icon name="chevron-left" size={28} color="#111827" />
+                    </TouchableOpacity>
+                </View>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <ActivityIndicator color={COLORS.primary} size="large" />
+                    <Text style={{ marginTop: 16, color: '#64748B' }}>Loading course content...</Text>
+                </View>
             </View>
         );
     }
@@ -50,7 +61,7 @@ const CourseScreen = () => {
     const progress = (currentSlideIndex + 1) / currentCourse.slides.length;
     const isLastSlide = currentSlideIndex === currentCourse.slides.length - 1;
 
-    const { user } = useAppSelector((state: RootState) => state.auth);
+
 
     const handleNext = () => {
         if (!quizCompleted) {

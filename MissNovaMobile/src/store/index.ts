@@ -4,6 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import authReducer from './slices/authSlice';
 import courseReducer from './slices/courseSlice';
 import gamificationReducer from './slices/gamificationSlice';
+import chatReducer from './slices/chatSlice';
 
 const persistConfig = {
     key: 'root',
@@ -18,6 +19,7 @@ export const store = configureStore({
         auth: persistedAuthReducer,
         course: courseReducer,
         gamification: gamificationReducer,
+        chat: chatReducer,
     },
     middleware: (getDefaultMiddleware) =>
         getDefaultMiddleware({

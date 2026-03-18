@@ -24,6 +24,7 @@ interface GamificationState {
   recentActivity: string[];
   coursePoints: Record<string, number>; // courseId -> points
   leaderboard: LeaderboardEntry[];
+  enrolledDegrees: string[]; // IDs of enrolled degrees
   loading: boolean;
   error: string | null;
 }
@@ -35,6 +36,7 @@ const initialState: GamificationState = {
   recentActivity: [],
   coursePoints: {},
   leaderboard: [],
+  enrolledDegrees: [],
   loading: false,
   error: null,
 };
@@ -87,6 +89,19 @@ export const syncCoursePoints = createAsyncThunk(
   }
 );
 
+// Async thunk to enroll in a degree
+export const enrollInDegree = createAsyncThunk(
+  'gamification/enrollDegree',
+  async ({ uid, degreeId }: { uid: string; degreeId: string }, { rejectWithValue }) => {
+    try {
+      await firestoreService.enrollDegree(uid, degreeId);
+      return degreeId;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const gamificationSlice = createSlice({
   name: 'gamification',
   initialState,
@@ -113,6 +128,11 @@ const gamificationSlice = createSlice({
         state.badges.push({ ...action.payload, unlockedAt: new Date().toISOString() });
       }
     },
+    addEnrolledDegree: (state, action: PayloadAction<string>) => {
+      if (!state.enrolledDegrees.includes(action.payload)) {
+        state.enrolledDegrees.push(action.payload);
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -124,15 +144,21 @@ const gamificationSlice = createSlice({
         if (action.payload) {
           state.totalXP = action.payload.totalXP || 0;
           state.badges = action.payload.badges || [];
+          state.enrolledDegrees = action.payload.enrolledDegrees || [];
           state.rank = Math.max(1, 10 - Math.floor(state.totalXP / 1000));
         }
       })
       .addCase(loadUserStats.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload as string;
+      })
+      .addCase(enrollInDegree.fulfilled, (state, action) => {
+        if (!state.enrolledDegrees.includes(action.payload)) {
+          state.enrolledDegrees.push(action.payload);
+        }
       });
   },
 });
 
-export const { setLeaderboard, addXP, updateCoursePoints, unlockBadge } = gamificationSlice.actions;
+export const { setLeaderboard, addXP, updateCoursePoints, unlockBadge, addEnrolledDegree } = gamificationSlice.actions;
 export default gamificationSlice.reducer;

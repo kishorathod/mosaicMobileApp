@@ -10,6 +10,7 @@ export interface UserStats {
   totalXP: number;
   rank: number;
   badges: Badge[];
+  enrolledDegrees?: string[]; // IDs of enrolled degrees
   lastUpdated: string;
 }
 
@@ -28,6 +29,23 @@ export const firestoreService = {
       console.log('✅ [Firestore] User profile synced:', uid);
     } catch (error) {
       console.error('❌ [Firestore] Error syncing user profile:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Enrolls a user in a degree path.
+   */
+  enrollDegree: async (uid: string, degreeId: string) => {
+    try {
+      const userDoc = firestore().collection(USERS_COLLECTION).doc(uid);
+      await userDoc.update({
+        enrolledDegrees: firestore.FieldValue.arrayUnion(degreeId),
+        lastUpdated: new Date().toISOString(),
+      });
+      console.log('✅ [Firestore] User enrolled in degree:', uid, degreeId);
+    } catch (error) {
+      console.error('❌ [Firestore] Error enrolling in degree:', error);
       throw error;
     }
   },

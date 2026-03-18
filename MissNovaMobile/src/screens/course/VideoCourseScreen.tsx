@@ -23,16 +23,32 @@ const VideoCourseScreen = () => {
     const route = useRoute();
     const navigation = useNavigation() as any;
     const dispatch = useAppDispatch();
-    const { course } = route.params as { course: any };
+    const { course } = (route.params as { course: any }) || { course: null };
 
     const { leaderboard } = useAppSelector((state: RootState) => state.gamification);
-    const myRank = leaderboard.find((l: LeaderboardEntry) => l.isMe)?.rank || 5;
-    const coursePoints = 500; // Mock fixed points for audio/video for now
-
+    const myRank = leaderboard?.find((l: LeaderboardEntry) => l.isMe)?.rank || 5;
+    
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [playbackSpeed, setPlaybackSpeed] = useState(1.0);
+
+    if (!course) {
+        return (
+            <View style={styles.container}>
+                <View style={styles.header}>
+                     <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <Icon name="chevron-left" size={28} color={COLORS.text} />
+                    </TouchableOpacity>
+                </View>
+                <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+                    <Text>No course data available.</Text>
+                </View>
+            </View>
+        );
+    }
+
+    const coursePoints = 500; // Mock fixed points for audio/video for now
 
     const handlePlayPause = () => {
         setIsPlaying(!isPlaying);
