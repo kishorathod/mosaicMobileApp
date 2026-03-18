@@ -1,6 +1,6 @@
 export const COLORS = {
   // Primary Colors (Sky Blue - Web Sync)
-  primary: '#0EA5E9',
+  primary: '#1DA1F2',
   primaryLight: '#7DD3FC',
   primaryDark: '#0369A1',
 
@@ -21,9 +21,9 @@ export const COLORS = {
   glass: 'rgba(255, 255, 255, 0.8)',
 
   // Text Colors
-  text: '#0F172A', // Slate 900
-  textSecondary: '#475569', // Slate 600
-  textTertiary: '#94A3B8', // Slate 400
+  text: '#111827', // Gray 900
+  textSecondary: '#6B7280', // Gray 500
+  textTertiary: '#9CA3AF', // Gray 400
 
   // Status Colors
   success: '#10B981',
@@ -105,16 +105,23 @@ export const SHADOWS = {
   md: {
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.08,
-    shadowRadius: 12, // Softer shadow as requested
-    elevation: 4,
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    elevation: 3,
   },
   lg: {
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.08,
     shadowRadius: 16,
-    elevation: 8,
+    elevation: 4,
+  },
+  card: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.06,
+    shadowRadius: 20,
+    elevation: 3,
   },
   playful: {
     shadowColor: '#000',
@@ -126,27 +133,28 @@ export const SHADOWS = {
 };
 
 export const CATEGORIES = [
-  { value: 'technology', label: 'Technology', emoji: '💻', icon: 'laptop', color: COLORS.technology },
-  { value: 'science', label: 'Science', emoji: '🔬', icon: 'microscope', color: COLORS.science },
-  { value: 'business', label: 'Business', emoji: '📊', icon: 'chart-bar', color: COLORS.business },
-  { value: 'arts', label: 'Arts & Humanities', emoji: '🎨', icon: 'palette', color: COLORS.arts },
-  { value: 'health', label: 'Health & Wellness', emoji: '🧘', icon: 'meditation', color: COLORS.health },
-  { value: 'language', label: 'Language Learning', emoji: '🗣️', icon: 'translate', color: COLORS.language },
-  { value: 'math', label: 'Mathematics', emoji: '🔢', icon: 'math-compass', color: COLORS.math },
-  { value: 'history', label: 'History', emoji: '📜', icon: 'history', color: COLORS.history },
-  { value: 'lifestyle', label: 'Lifestyle', emoji: '🏡', icon: 'home-heart', color: COLORS.lifestyle },
-  { value: 'other', label: 'Other', emoji: '✨', icon: 'star-four-points', color: COLORS.other },
+  { value: 'technology', label: 'Technology', emoji: '💻', icon: 'application-brackets-outline', color: COLORS.technology },
+  { value: 'science', label: 'Science', emoji: '🔬', icon: 'molecule', color: COLORS.science },
+  { value: 'business', label: 'Business', emoji: '📊', icon: 'finance', color: COLORS.business },
+  { value: 'arts', label: 'Arts & Humanities', emoji: '🎨', icon: 'drawing-variant', color: COLORS.arts },
+  { value: 'health', label: 'Health & Wellness', emoji: '🧘', icon: 'heart-pulse', color: COLORS.health },
+  { value: 'language', label: 'Language Learning', emoji: '🗣️', icon: 'badge-account-horizontal-outline', color: COLORS.language },
+  { value: 'math', label: 'Mathematics', emoji: '🔢', icon: 'calculator-variant-outline', color: COLORS.math },
+  { value: 'history', label: 'History', emoji: '📜', icon: 'pillar', color: COLORS.history },
+  { value: 'lifestyle', label: 'Lifestyle', emoji: '🏡', icon: 'home-account', color: COLORS.lifestyle },
+  { value: 'other', label: 'Other', emoji: '✨', icon: 'auto-fix', color: COLORS.other },
 ];
 
 export const DIFFICULTY_LEVELS = [
-  { value: 'beginner', label: 'Beginner', emoji: '🌱', icon: 'sprout', color: COLORS.success },
-  { value: 'intermediate', label: 'Intermediate', emoji: '🌿', icon: 'leaf', color: COLORS.warning },
-  { value: 'advanced', label: 'Advanced', emoji: '🌳', icon: 'tree', color: COLORS.error },
+  { value: 'beginner', label: 'Beginner', emoji: '🌱', icon: 'sprout-outline', color: COLORS.success },
+  { value: 'intermediate', label: 'Intermediate', emoji: '📊', icon: 'trending-up', color: COLORS.warning },
+  { value: 'advanced', label: 'Advanced', emoji: '🚀', icon: 'rocket-launch-outline', color: COLORS.error },
   { value: 'all-levels', label: 'All Levels', emoji: '🌎', icon: 'earth', color: COLORS.info },
 ];
 
 export const COURSE_TYPES = [
-  { value: 'slides', label: 'Slides', emoji: '📑', icon: 'presentation', color: COLORS.primary },
-  { value: 'video', label: 'Video', emoji: '🎬', icon: 'video', color: COLORS.secondary },
-  { value: 'audio', label: 'Audio', emoji: '🎧', icon: 'headphones', color: COLORS.accent },
+  { value: 'slides', label: 'Slides', emoji: '📑', icon: 'card-bulleted-outline', color: COLORS.primary },
+  { value: 'video', label: 'Video', emoji: '🎥', icon: 'play-box-multiple-outline', color: COLORS.secondary },
+  { value: 'audio', label: 'Audio', emoji: '🎧', icon: 'headphones-settings', color: COLORS.accent },
+  { value: 'notes', label: 'Notes', emoji: '📝', icon: 'notebook-outline', color: COLORS.textSecondary },
 ];

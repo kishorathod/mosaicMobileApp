@@ -4,6 +4,9 @@ import { Text, Button, ProgressBar, Card, IconButton } from 'react-native-paper'
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS } from '@/theme/theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { RootState } from '@/store';
+import { updateCoursePoints, LeaderboardEntry } from '@/store/slices/gamificationSlice';
 
 const { width } = Dimensions.get('window');
 
@@ -18,8 +21,13 @@ interface VideoCourse {
 
 const VideoCourseScreen = () => {
     const route = useRoute();
-    const navigation = useNavigation();
-    const { course } = route.params as { course: VideoCourse };
+    const navigation = useNavigation() as any;
+    const dispatch = useAppDispatch();
+    const { course } = route.params as { course: any };
+
+    const { leaderboard } = useAppSelector((state: RootState) => state.gamification);
+    const myRank = leaderboard.find((l: LeaderboardEntry) => l.isMe)?.rank || 5;
+    const coursePoints = 500; // Mock fixed points for audio/video for now
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -54,15 +62,25 @@ const VideoCourseScreen = () => {
 
     return (
         <View style={styles.container}>
-            {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Icon name="arrow-left" size={24} color={COLORS.text} />
-                </TouchableOpacity>
-                <Text variant="titleLarge" style={styles.headerTitle}>
-                    Video Course
-                </Text>
-                <View style={{ width: 40 }} />
+                <View style={styles.headerTop}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <Icon name="chevron-left" size={28} color={COLORS.text} />
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>
+                        Video Course
+                    </Text>
+                    <View style={styles.statsContainer}>
+                        <View style={styles.statPill}>
+                            <Icon name="star" size={14} color="#F59E0B" />
+                            <Text style={styles.statText}>{coursePoints} pts</Text>
+                        </View>
+                        <View style={[styles.statPill, { backgroundColor: '#F0F9FF' }]}>
+                            <Icon name="trophy" size={14} color="#0EA5E9" />
+                            <Text style={[styles.statText, { color: '#0EA5E9' }]}>#{myRank}</Text>
+                        </View>
+                    </View>
+                </View>
             </View>
 
             <ScrollView style={styles.content}>
@@ -128,42 +146,54 @@ const VideoCourseScreen = () => {
                 </Card>
 
                 {/* Course Info */}
-                <Card style={styles.infoCard}>
-                    <Card.Content>
-                        <Text variant="headlineSmall" style={styles.courseTitle}>
-                            {course.title}
-                        </Text>
-                        <Text variant="bodyLarge" style={styles.description}>
-                            {course.description}
-                        </Text>
-                    </Card.Content>
-                </Card>
+                <View style={styles.infoCard}>
+                    <Text style={styles.courseTitle}>
+                        {course.title}
+                    </Text>
+                    <Text style={styles.description}>
+                        {course.description}
+                    </Text>
+                </View>
 
                 {/* Transcript */}
                 {course.transcript && (
-                    <Card style={styles.transcriptCard}>
-                        <Card.Content>
-                            <View style={styles.transcriptHeader}>
-                                <Icon name="text-box-outline" size={20} color={COLORS.text} style={{ marginRight: 8 }} />
-                                <Text variant="titleMedium" style={styles.transcriptTitle}>
-                                    Transcript
-                                </Text>
-                            </View>
-                            <Text variant="bodyMedium" style={styles.transcriptText}>
-                                {course.transcript}
+                    <View style={styles.transcriptCard}>
+                        <View style={styles.transcriptHeader}>
+                            <Icon name="text-box-outline" size={20} color="#111827" style={{ marginRight: 8 }} />
+                            <Text style={styles.transcriptTitle}>
+                                Transcript
                             </Text>
-                        </Card.Content>
-                    </Card>
+                        </View>
+                        <Text style={styles.transcriptText}>
+                            {course.transcript}
+                        </Text>
+                    </View>
                 )}
 
                 {/* Placeholder Note */}
-                <Card style={styles.noteCard}>
-                    <Card.Content>
-                        <Text variant="bodyMedium" style={styles.noteText}>
-                            Video playback functionality will be implemented soon
-                        </Text>
-                    </Card.Content>
-                </Card>
+                <View style={styles.noteCard}>
+                    <Text style={styles.noteText}>
+                        Video playback functionality will be implemented soon
+                    </Text>
+                </View>
+
+                {/* Finish Button */}
+                <TouchableOpacity 
+                    style={styles.finishButton}
+                    onPress={() => {
+                        dispatch(updateCoursePoints({ 
+                            courseId: course.id || 'video-1', 
+                            points: 500 
+                        }));
+                        navigation.replace('Certificate', { 
+                            courseTitle: course.title,
+                            score: 100
+                        });
+                    }}
+                >
+                    <Text style={styles.finishButtonLabel}>Finish Course</Text>
+                    <Icon name="certificate" size={20} color="#FFFFFF" />
+                </TouchableOpacity>
             </ScrollView>
         </View>
     );
@@ -175,27 +205,48 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.background,
     },
     header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 24,
+        backgroundColor: '#FFFFFF',
         paddingTop: 16,
-        paddingBottom: 16,
-        backgroundColor: COLORS.surface,
+        paddingBottom: 24,
+        paddingHorizontal: 16,
         ...SHADOWS.sm,
-        marginBottom: 10,
+    },
+    headerTop: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    statsContainer: {
+        flexDirection: 'row',
+        gap: 6,
+    },
+    statPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFFBEB',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+        gap: 4,
+    },
+    statText: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: '#D97706',
     },
     backButton: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: COLORS.surfaceVariant,
+        backgroundColor: '#F8FAFC',
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
     },
     headerTitle: {
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
-        color: COLORS.text,
+        fontWeight: 'bold',
+        color: '#111827',
         fontSize: 18,
     },
     content: {
@@ -203,14 +254,14 @@ const styles = StyleSheet.create({
     },
     videoCard: {
         margin: 0,
-        backgroundColor: '#000',
+        backgroundColor: '#000000',
         borderRadius: 0,
         ...SHADOWS.lg,
     },
     videoContainer: {
         width: '100%',
         aspectRatio: 16 / 9,
-        backgroundColor: '#000',
+        backgroundColor: '#000000',
         position: 'relative',
     },
     videoPlaceholder: {
@@ -219,139 +270,147 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         backgroundColor: '#0F172A',
     },
-    videoPlaceholderText: {
-        fontSize: 48,
-        color: COLORS.surface,
-        marginBottom: SPACING.md,
-    },
     videoPlaceholderSubtext: {
-        fontSize: 16,
-        color: COLORS.textTertiary,
+        fontSize: 14,
+        color: '#94A3B8',
         textAlign: 'center',
-        paddingHorizontal: SPACING.xxl,
+        paddingHorizontal: 32,
         fontWeight: '500',
     },
     controlsOverlay: {
         ...StyleSheet.absoluteFillObject,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: 'rgba(15, 23, 42, 0.3)',
+        backgroundColor: 'rgba(15, 23, 42, 0.4)',
     },
     playButtonOverlay: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: COLORS.primary + 'CC',
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+        backgroundColor: '#1DA1F2E6',
         justifyContent: 'center',
         alignItems: 'center',
         ...SHADOWS.lg,
     },
     fullscreenButton: {
         position: 'absolute',
-        bottom: SPACING.lg,
-        right: SPACING.lg,
+        bottom: 16,
+        right: 16,
         backgroundColor: 'rgba(0, 0, 0, 0.6)',
-        borderRadius: BORDER_RADIUS.md,
+        borderRadius: 8,
     },
     progressContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginTop: SPACING.md,
+        marginTop: 16,
     },
     progressBar: {
         flex: 1,
-        marginHorizontal: SPACING.md,
+        marginHorizontal: 12,
         height: 6,
-        borderRadius: BORDER_RADIUS.full,
+        borderRadius: 3,
         backgroundColor: 'rgba(255, 255, 255, 0.2)',
     },
     timeText: {
         fontSize: 12,
-        color: COLORS.surface,
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
-        width: 45,
+        color: '#FFFFFF',
+        fontWeight: 'bold',
+        width: 40,
         textAlign: 'center',
     },
     additionalControls: {
         flexDirection: 'row',
         justifyContent: 'center',
-        marginTop: SPACING.md,
-        paddingBottom: SPACING.md,
+        marginTop: 16,
+        paddingBottom: 16,
     },
     speedButton: {
-        paddingHorizontal: SPACING.xl,
+        paddingHorizontal: 20,
         paddingVertical: 6,
-        borderRadius: BORDER_RADIUS.full,
+        borderRadius: 20,
         backgroundColor: 'rgba(255, 255, 255, 0.1)',
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.2)',
     },
     speedText: {
         fontSize: 12,
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
-        color: COLORS.surface,
-        letterSpacing: 1,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
     },
     infoCard: {
-        margin: SPACING.lg,
-        padding: SPACING.lg,
-        backgroundColor: COLORS.surface,
-        borderRadius: BORDER_RADIUS.xl,
-        ...SHADOWS.md,
-        borderWidth: 1,
-        borderColor: COLORS.borderLight,
+        margin: 16,
+        padding: 24,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        ...SHADOWS.card,
     },
     courseTitle: {
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
-        color: COLORS.text,
+        fontWeight: 'bold',
+        color: '#111827',
         fontSize: 24,
         letterSpacing: -0.5,
-        marginBottom: SPACING.md,
+        marginBottom: 16,
     },
     description: {
-        color: COLORS.textSecondary,
+        color: '#6B7280',
         lineHeight: 24,
         fontSize: 16,
     },
     transcriptCard: {
-        marginHorizontal: SPACING.lg,
-        marginBottom: SPACING.lg,
-        padding: SPACING.lg,
-        borderRadius: BORDER_RADIUS.xl,
-        backgroundColor: COLORS.surface,
-        ...SHADOWS.md,
-        borderWidth: 1,
-        borderColor: COLORS.borderLight,
+        marginHorizontal: 16,
+        marginBottom: 16,
+        padding: 24,
+        borderRadius: 16,
+        backgroundColor: '#FFFFFF',
+        ...SHADOWS.card,
     },
     transcriptHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: SPACING.md,
+        marginBottom: 16,
     },
     transcriptTitle: {
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
-        color: COLORS.text,
+        fontWeight: 'bold',
+        color: '#111827',
         fontSize: 18,
     },
     transcriptText: {
-        color: COLORS.textSecondary,
+        color: '#4B5563',
         lineHeight: 24,
         fontSize: 15,
     },
     noteCard: {
-        marginHorizontal: SPACING.lg,
-        marginBottom: SPACING.xxl,
-        padding: SPACING.md,
-        borderRadius: BORDER_RADIUS.lg,
-        backgroundColor: COLORS.info + '10',
+        marginHorizontal: 16,
+        marginBottom: 48,
+        padding: 16,
+        borderRadius: 12,
+        backgroundColor: '#F0F9FF',
         borderWidth: 1,
-        borderColor: COLORS.info + '20',
+        borderColor: '#BAE6FD',
     },
     noteText: {
-        color: COLORS.info,
+        color: '#0369A1',
         textAlign: 'center',
         fontSize: 12,
-        fontWeight: '500',
+        fontWeight: '600',
+    },
+    finishButton: {
+        margin: 16,
+        marginTop: 0,
+        marginBottom: 40,
+        height: 56,
+        backgroundColor: '#1DA1F2',
+        borderRadius: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        ...SHADOWS.md,
+    },
+    finishButtonLabel: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
 

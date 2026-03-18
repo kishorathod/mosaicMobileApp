@@ -71,6 +71,33 @@ export async function POST(req: Request) {
       JSON.stringify(courseSchema.shape, null, 2)
     );
 
+    // Fallback if API Key is missing or Demo Mode is forced
+    const isMissingKey = !process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here';
+    const isForcedDemo = process.env.DEMO_MODE === 'true';
+
+    if (isMissingKey || isForcedDemo) {
+      console.log(`⚠️ [GENERATE-COURSE] ${isForcedDemo ? 'Demo Mode forced' : 'API Key missing'}, using mock fallback`);
+      const mockCourse = {
+        title: `${prompt} Essentials`,
+        description: `A comprehensive guide to ${prompt} concepts and best practices.`,
+        total_slides: 5,
+        slides: Array.from({ length: 5 }).map((_, i) => ({
+          slide_number: i + 1,
+          title: `Exploring ${prompt} - Part ${i + 1}`,
+          content: `## ${prompt} Deep Dive\n\nThis is a placeholder for ${prompt} content on slide ${i + 1}. In a real scenario, this would be AI-generated detailed markdown content.\n\n### Key Learnings:\n- fundamental concept A\n- advanced technique B\n- practical application C\n\nStay tuned for more Miss Nova magic!`,
+          quiz: {
+            question: `What is a core concept of ${prompt} discussed in part ${i + 1}?`,
+            options: ["The first option", "The second option", "The correct answer", "None of the above"],
+            correct_answer: "The correct answer",
+            explanation: `The correct answer is confirmed because it's the fundamental building block of ${prompt} at this stage.`
+          }
+        }))
+      };
+      // Simulate network delay
+      await new Promise(r => setTimeout(r, 2000));
+      return NextResponse.json(mockCourse);
+    }
+
     const startTime = Date.now();
     const { object } = await generateObject({
       model: openai("gpt-4o"),
@@ -93,6 +120,32 @@ export async function POST(req: Request) {
     return NextResponse.json(object);
   } catch (error) {
     console.error("❌ [GENERATE-COURSE] Course generation error:", error);
+    
+    // Fallback if quota is exceeded or other AI service errors
+    const errorString = JSON.stringify(error).toLowerCase() + (error instanceof Error ? error.message.toLowerCase() : "");
+    const isQuotaError = errorString.includes("quota") || errorString.includes("billing") || errorString.includes("limit") || errorString.includes("insufficient");
+    
+    if (isQuotaError) {
+      console.log("⚠️ [GENERATE-COURSE] AI Service Limit/Quota hit, using mock fallback");
+      const mockCourse = {
+        title: `${prompt} Essentials (Demo Mode)`,
+        description: `A comprehensive guide to ${prompt} concepts. (This is a demo course due to API quota limits)`,
+        total_slides: 5,
+        slides: Array.from({ length: 5 }).map((_, i) => ({
+          slide_number: i + 1,
+          title: `Exploring ${prompt} - Part ${i + 1}`,
+          content: `## ${prompt} Deep Dive\n\nThis is a placeholder for ${prompt} content on slide ${i + 1}. In a real scenario, this would be AI-generated detailed markdown content.\n\n### Key Learnings:\n- fundamental concept A\n- advanced technique B\n- practical application C\n\nStay tuned for more Miss Nova magic!`,
+          quiz: {
+            question: `What is a core concept of ${prompt} discussed in part ${i + 1}?`,
+            options: ["The first option", "The second option", "The correct answer", "None of the above"],
+            correct_answer: "The correct answer",
+            explanation: `The correct answer is confirmed because it's the fundamental building block of ${prompt} at this stage.`
+          }
+        }))
+      };
+      return NextResponse.json(mockCourse);
+    }
+
     console.error(
       "❌ [GENERATE-COURSE] Error stack:",
       error instanceof Error ? error.stack : "No stack trace"

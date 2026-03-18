@@ -4,6 +4,9 @@ import { Text, Button, ProgressBar, Card, IconButton } from 'react-native-paper'
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS } from '@/theme/theme';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { RootState } from '@/store';
+import { updateCoursePoints, LeaderboardEntry } from '@/store/slices/gamificationSlice';
 
 interface AudioCourse {
     title: string;
@@ -16,8 +19,13 @@ interface AudioCourse {
 
 const AudioCourseScreen = () => {
     const route = useRoute();
-    const navigation = useNavigation();
-    const { course } = route.params as { course: AudioCourse };
+    const navigation = useNavigation() as any;
+    const dispatch = useAppDispatch();
+    const { course } = route.params as { course: any };
+
+    const { leaderboard } = useAppSelector((state: RootState) => state.gamification);
+    const myRank = leaderboard.find((l: LeaderboardEntry) => l.isMe)?.rank || 5;
+    const coursePoints = 500; // Mock fixed points for audio/video for now
 
     const [isPlaying, setIsPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -51,120 +59,141 @@ const AudioCourseScreen = () => {
 
     return (
         <View style={styles.container}>
-            {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-                    <Icon name="arrow-left" size={24} color={COLORS.text} />
-                </TouchableOpacity>
-                <Text variant="titleLarge" style={styles.headerTitle}>
-                    Audio Course
-                </Text>
-                <View style={{ width: 40 }} />
+                <View style={styles.headerTop}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
+                        <Icon name="chevron-left" size={28} color={COLORS.text} />
+                    </TouchableOpacity>
+                    <Text style={styles.headerTitle}>
+                        Audio Course
+                    </Text>
+                    <View style={styles.statsContainer}>
+                        <View style={styles.statPill}>
+                            <Icon name="star" size={14} color="#F59E0B" />
+                            <Text style={styles.statText}>{coursePoints} pts</Text>
+                        </View>
+                        <View style={[styles.statPill, { backgroundColor: '#F0F9FF' }]}>
+                            <Icon name="trophy" size={14} color="#0EA5E9" />
+                            <Text style={[styles.statText, { color: '#0EA5E9' }]}>#{myRank}</Text>
+                        </View>
+                    </View>
+                </View>
             </View>
 
             <ScrollView style={styles.content}>
                 {/* Course Info */}
-                <Card style={styles.infoCard}>
-                    <Card.Content>
-                        <View style={styles.titleContainer}>
-                            <Icon name="headphones" size={32} color={COLORS.primary} style={{ marginRight: 12 }} />
-                            <Text variant="headlineSmall" style={styles.courseTitle}>
-                                {course.title}
-                            </Text>
-                        </View>
-                        <Text variant="bodyLarge" style={styles.description}>
-                            {course.description}
+                <View style={styles.infoCard}>
+                    <View style={styles.titleContainer}>
+                        <Icon name="headphones" size={28} color="#1DA1F2" style={{ marginRight: 12 }} />
+                        <Text style={styles.courseTitle}>
+                            {course.title}
                         </Text>
-                    </Card.Content>
-                </Card>
+                    </View>
+                    <Text style={styles.description}>
+                        {course.description}
+                    </Text>
+                </View>
 
                 {/* Audio Player */}
-                <Card style={styles.playerCard}>
-                    <Card.Content>
-                        {/* Waveform Visualization Placeholder */}
-                        <View style={styles.waveformContainer}>
-                            <Icon name="sine-wave" size={48} color={COLORS.primary} />
-                            <Text style={styles.waveformPlaceholder}>
-                                AUDIO WAVEFORM
-                            </Text>
-                        </View>
+                <View style={styles.playerCard}>
+                    {/* Waveform Visualization Placeholder */}
+                    <View style={styles.waveformContainer}>
+                        <Icon name="sine-wave" size={48} color="#1DA1F2" />
+                        <Text style={styles.waveformPlaceholder}>
+                            AUDIO WAVEFORM
+                        </Text>
+                    </View>
 
-                        {/* Progress Bar */}
-                        <View style={styles.progressContainer}>
-                            <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
-                            <ProgressBar
-                                progress={progress}
-                                style={styles.progressBar}
-                                color={COLORS.primary}
+                    {/* Progress Bar */}
+                    <View style={styles.progressContainer}>
+                        <Text style={styles.timeText}>{formatTime(currentTime)}</Text>
+                        <ProgressBar
+                            progress={progress}
+                            style={styles.progressBar}
+                            color="#1DA1F2"
+                        />
+                        <Text style={styles.timeText}>{formatTime(course.duration)}</Text>
+                    </View>
+
+                    {/* Playback Controls */}
+                    <View style={styles.controls}>
+                        <IconButton
+                            icon="rewind-10"
+                            size={32}
+                            onPress={() => handleSeek(Math.max(0, currentTime - 10))}
+                            iconColor="#6B7280"
+                        />
+
+                        <TouchableOpacity
+                            style={styles.playButton}
+                            onPress={handlePlayPause}
+                            activeOpacity={0.8}
+                        >
+                            <Icon 
+                                name={isPlaying ? 'pause' : 'play'} 
+                                size={40} 
+                                color="#FFFFFF" 
                             />
-                            <Text style={styles.timeText}>{formatTime(course.duration)}</Text>
-                        </View>
+                        </TouchableOpacity>
 
-                        {/* Playback Controls */}
-                        <View style={styles.controls}>
-                            <IconButton
-                                icon="rewind-10"
-                                size={32}
-                                onPress={() => handleSeek(Math.max(0, currentTime - 10))}
-                                iconColor={COLORS.textSecondary}
-                            />
+                        <IconButton
+                            icon="fast-forward-10"
+                            size={32}
+                            onPress={() => handleSeek(Math.min(course.duration, currentTime + 10))}
+                            iconColor="#6B7280"
+                        />
+                    </View>
 
-                            <TouchableOpacity
-                                style={styles.playButton}
-                                onPress={handlePlayPause}
-                            >
-                                <IconButton
-                                    icon={isPlaying ? 'pause' : 'play'}
-                                    size={40}
-                                    iconColor={COLORS.surface}
-                                />
-                            </TouchableOpacity>
-
-                            <IconButton
-                                icon="fast-forward-10"
-                                size={32}
-                                onPress={() => handleSeek(Math.min(course.duration, currentTime + 10))}
-                                iconColor={COLORS.textSecondary}
-                            />
-                        </View>
-
-                        {/* Speed Control */}
-                        <View style={styles.speedControl}>
-                            <TouchableOpacity
-                                style={styles.speedButton}
-                                onPress={handleSpeedChange}
-                            >
-                                <Text style={styles.speedText}>{playbackSpeed}x</Text>
-                            </TouchableOpacity>
-                        </View>
-                    </Card.Content>
-                </Card>
+                    {/* Speed Control */}
+                    <View style={styles.speedControl}>
+                        <TouchableOpacity
+                            style={styles.speedButton}
+                            onPress={handleSpeedChange}
+                        >
+                            <Text style={styles.speedText}>{playbackSpeed}x</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
 
                 {/* Transcript */}
                 {course.transcript && (
-                    <Card style={styles.transcriptCard}>
-                        <Card.Content>
-                            <View style={styles.transcriptHeader}>
-                                <Icon name="text-box-outline" size={20} color={COLORS.text} style={{ marginRight: 8 }} />
-                                <Text variant="titleMedium" style={styles.transcriptTitle}>
-                                    Transcript
-                                </Text>
-                            </View>
-                            <Text variant="bodyMedium" style={styles.transcriptText}>
-                                {course.transcript}
+                    <View style={styles.transcriptCard}>
+                        <View style={styles.transcriptHeader}>
+                            <Icon name="text-box-outline" size={20} color="#111827" style={{ marginRight: 8 }} />
+                            <Text style={styles.transcriptTitle}>
+                                Transcript
                             </Text>
-                        </Card.Content>
-                    </Card>
+                        </View>
+                        <Text style={styles.transcriptText}>
+                            {course.transcript}
+                        </Text>
+                    </View>
                 )}
 
                 {/* Placeholder Note */}
-                <Card style={styles.noteCard}>
-                    <Card.Content>
-                        <Text variant="bodyMedium" style={styles.noteText}>
-                            Audio playback functionality will be implemented soon
-                        </Text>
-                    </Card.Content>
-                </Card>
+                <View style={styles.noteCard}>
+                    <Text style={styles.noteText}>
+                        Audio playback functionality will be implemented soon
+                    </Text>
+                </View>
+
+                {/* Finish Button */}
+                <TouchableOpacity 
+                    style={styles.finishButton}
+                    onPress={() => {
+                        dispatch(updateCoursePoints({ 
+                            courseId: course.id || 'audio-1', 
+                            points: 500 
+                        }));
+                        navigation.replace('Certificate', { 
+                            courseTitle: course.title,
+                            score: 100
+                        });
+                    }}
+                >
+                    <Text style={styles.finishButtonLabel}>Finish Course</Text>
+                    <Icon name="certificate" size={20} color="#FFFFFF" />
+                </TouchableOpacity>
             </ScrollView>
         </View>
     );
@@ -176,176 +205,209 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.background,
     },
     header: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 24,
+        backgroundColor: '#FFFFFF',
         paddingTop: 16,
-        paddingBottom: 16,
-        backgroundColor: COLORS.surface,
+        paddingBottom: 24,
+        paddingHorizontal: 16,
         ...SHADOWS.sm,
-        marginBottom: 10,
+    },
+    headerTop: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    statsContainer: {
+        flexDirection: 'row',
+        gap: 6,
+    },
+    statPill: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: '#FFFBEB',
+        paddingHorizontal: 8,
+        paddingVertical: 4,
+        borderRadius: 12,
+        gap: 4,
+    },
+    statText: {
+        fontSize: 10,
+        fontWeight: 'bold',
+        color: '#D97706',
     },
     backButton: {
         width: 40,
         height: 40,
         borderRadius: 20,
-        backgroundColor: COLORS.surfaceVariant,
+        backgroundColor: '#F8FAFC',
         justifyContent: 'center',
         alignItems: 'center',
+        borderWidth: 1,
+        borderColor: '#E2E8F0',
     },
     headerTitle: {
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
-        color: COLORS.text,
+        fontWeight: 'bold',
+        color: '#111827',
         fontSize: 18,
     },
     content: {
         flex: 1,
     },
     infoCard: {
-        margin: SPACING.lg,
-        padding: SPACING.lg,
-        backgroundColor: COLORS.surface,
-        borderRadius: BORDER_RADIUS.xl,
-        ...SHADOWS.md,
-        borderWidth: 1,
-        borderColor: COLORS.borderLight,
+        margin: 16,
+        padding: 24,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        ...SHADOWS.card,
     },
     titleContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: SPACING.md,
+        marginBottom: 16,
     },
     courseTitle: {
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
-        color: COLORS.primary,
+        fontWeight: 'bold',
+        color: '#111827',
         fontSize: 24,
         letterSpacing: -0.5,
         flex: 1,
     },
     description: {
-        color: COLORS.textSecondary,
+        color: '#6B7280',
         lineHeight: 24,
         fontSize: 16,
     },
     playerCard: {
-        marginHorizontal: SPACING.lg,
-        marginBottom: SPACING.lg,
-        padding: SPACING.lg,
-        backgroundColor: COLORS.surface,
-        borderRadius: BORDER_RADIUS.xl,
-        ...SHADOWS.lg,
-        borderWidth: 1,
-        borderColor: COLORS.borderLight,
+        marginHorizontal: 16,
+        marginBottom: 16,
+        padding: 24,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        ...SHADOWS.card,
     },
     waveformContainer: {
         height: 100,
-        backgroundColor: COLORS.primary + '05',
-        borderRadius: BORDER_RADIUS.lg,
+        backgroundColor: '#F9FAFB',
+        borderRadius: 12,
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: SPACING.xl,
+        marginBottom: 24,
         borderWidth: 1,
         borderStyle: 'dashed',
-        borderColor: COLORS.primary + '20',
+        borderColor: '#E5E7EB',
     },
     waveformPlaceholder: {
-        fontSize: 14,
+        fontSize: 12,
         fontWeight: 'bold',
-        color: COLORS.primary,
-        letterSpacing: 2,
+        color: '#1DA1F2',
+        letterSpacing: 1.5,
+        marginTop: 8,
     },
     progressContainer: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: SPACING.xl,
+        marginBottom: 32,
     },
     progressBar: {
         flex: 1,
-        marginHorizontal: SPACING.md,
+        marginHorizontal: 12,
         height: 8,
-        borderRadius: BORDER_RADIUS.full,
-        backgroundColor: COLORS.surfaceVariant,
+        borderRadius: 4,
+        backgroundColor: '#F1F5F9',
     },
     timeText: {
         fontSize: 12,
-        color: COLORS.textSecondary,
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
-        width: 45,
+        color: '#6B7280',
+        fontWeight: 'bold',
+        width: 40,
         textAlign: 'center',
     },
     controls: {
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
-        marginBottom: SPACING.xl,
+        marginBottom: 32,
     },
     playButton: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: COLORS.primary,
+        width: 72,
+        height: 72,
+        borderRadius: 36,
+        backgroundColor: '#1DA1F2',
         justifyContent: 'center',
         alignItems: 'center',
-        marginHorizontal: SPACING.xl,
-        ...SHADOWS.lg,
+        marginHorizontal: 24,
+        ...SHADOWS.md,
     },
     speedControl: {
         alignItems: 'center',
     },
     speedButton: {
-        paddingHorizontal: SPACING.xl,
-        paddingVertical: SPACING.sm,
-        borderRadius: BORDER_RADIUS.full,
-        backgroundColor: COLORS.surfaceVariant,
+        paddingHorizontal: 20,
+        paddingVertical: 8,
+        borderRadius: 20,
+        backgroundColor: '#F1F5F9',
         borderWidth: 1,
-        borderColor: COLORS.border,
+        borderColor: '#E2E8F0',
     },
     speedText: {
         fontSize: 14,
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
-        color: COLORS.textSecondary,
-        letterSpacing: 1,
+        fontWeight: 'bold',
+        color: '#475569',
     },
     transcriptCard: {
-        marginHorizontal: SPACING.lg,
-        marginBottom: SPACING.lg,
-        padding: SPACING.lg,
-        backgroundColor: COLORS.surface,
-        borderRadius: BORDER_RADIUS.xl,
-        ...SHADOWS.md,
-        borderWidth: 1,
-        borderColor: COLORS.borderLight,
+        marginHorizontal: 16,
+        marginBottom: 16,
+        padding: 24,
+        backgroundColor: '#FFFFFF',
+        borderRadius: 16,
+        ...SHADOWS.card,
     },
     transcriptHeader: {
         flexDirection: 'row',
         alignItems: 'center',
-        marginBottom: SPACING.md,
+        marginBottom: 16,
     },
     transcriptTitle: {
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
-        color: COLORS.text,
+        fontWeight: 'bold',
+        color: '#111827',
         fontSize: 18,
     },
     transcriptText: {
-        color: COLORS.textSecondary,
+        color: '#4B5563',
         lineHeight: 24,
         fontSize: 15,
     },
     noteCard: {
-        marginHorizontal: SPACING.lg,
-        marginBottom: SPACING.xxl,
-        padding: SPACING.md,
-        borderRadius: BORDER_RADIUS.lg,
-        backgroundColor: COLORS.info + '10',
+        marginHorizontal: 16,
+        marginBottom: 48,
+        padding: 16,
+        borderRadius: 12,
+        backgroundColor: '#F0F9FF',
         borderWidth: 1,
-        borderColor: COLORS.info + '20',
+        borderColor: '#BAE6FD',
     },
     noteText: {
-        color: COLORS.info,
+        color: '#0369A1',
         textAlign: 'center',
         fontSize: 12,
-        fontWeight: '500',
+        fontWeight: '600',
+    },
+    finishButton: {
+        margin: 16,
+        marginTop: 0,
+        marginBottom: 40,
+        height: 56,
+        backgroundColor: '#1DA1F2',
+        borderRadius: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        ...SHADOWS.md,
+    },
+    finishButtonLabel: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontWeight: 'bold',
     },
 });
 

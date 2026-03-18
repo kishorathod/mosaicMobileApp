@@ -27,21 +27,21 @@ const styles = StyleSheet.create({
     badge: {
         flexDirection: 'row',
         alignItems: 'center',
-        paddingHorizontal: SPACING.md,
-        paddingVertical: 6,
-        borderRadius: BORDER_RADIUS.md,
+        paddingHorizontal: 12,
+        height: 28,
+        borderRadius: 14,
         borderWidth: 1,
     },
     emoji: {
-        fontSize: TYPOGRAPHY.fontSize.sm,
-        marginRight: SPACING.xs,
+        fontSize: 14,
+        marginRight: 4,
     },
     icon: {
-        marginRight: SPACING.xs,
+        marginRight: 4,
     },
     label: {
-        fontSize: 10,
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
-        letterSpacing: 1,
+        fontSize: 12,
+        fontWeight: '600',
+        letterSpacing: 0.5,
     },
 });

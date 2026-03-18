@@ -5,10 +5,13 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    Keyboard,
+    TouchableOpacity,
 } from 'react-native';
 import { Text, TextInput, Button, ActivityIndicator } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigation } from '@react-navigation/native';
+import MascotSvg from '@/assets/images/mascot.svg';
 import { register, clearError } from '@/store/slices/authSlice';
 import { AppDispatch, RootState } from '@/store';
 import type { StackNavigationProp } from '@react-navigation/stack';
@@ -46,6 +49,7 @@ const RegisterScreen = () => {
             return;
         }
 
+        Keyboard.dismiss();
         await dispatch(register({ email, password, displayName }));
     };
 
@@ -56,18 +60,21 @@ const RegisterScreen = () => {
 
     return (
         <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            behavior={Platform.OS === 'ios' ? 'padding' : undefined}
             style={styles.container}>
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.header}>
-                    <Text variant="displaySmall" style={styles.title}>
+                    <View style={styles.mascotContainer}>
+                        <MascotSvg width={60} height={60} />
+                    </View>
+                    <Text variant="titleMedium" style={styles.title}>
                         Miss Nova
                     </Text>
-                    <Text variant="headlineSmall" style={styles.subtitle}>
-                        Create Account
+                    <Text variant="headlineMedium" style={styles.subtitle}>
+                        Join Miss Nova!
                     </Text>
                     <Text variant="bodyLarge" style={styles.description}>
-                        Join us and start learning!
+                        Create an account to start learning
                     </Text>
                 </View>
 
@@ -78,7 +85,12 @@ const RegisterScreen = () => {
                         onChangeText={setDisplayName}
                         mode="outlined"
                         style={styles.input}
-                        left={<TextInput.Icon icon="account" />}
+                        textColor="#222222"
+                        placeholderTextColor="#999999"
+                        outlineColor="#CCCCCC"
+                        activeOutlineColor="#7B61FF"
+                        left={<TextInput.Icon icon="account" color="#999999" />}
+                        theme={{ colors: { background: '#FFFFFF' } }}
                     />
 
                     <TextInput
@@ -89,7 +101,12 @@ const RegisterScreen = () => {
                         keyboardType="email-address"
                         autoCapitalize="none"
                         style={styles.input}
-                        left={<TextInput.Icon icon="email" />}
+                        textColor="#222222"
+                        placeholderTextColor="#999999"
+                        outlineColor="#CCCCCC"
+                        activeOutlineColor="#7B61FF"
+                        left={<TextInput.Icon icon="email" color="#999999" />}
+                        theme={{ colors: { background: '#FFFFFF' } }}
                     />
 
                     <TextInput
@@ -99,7 +116,12 @@ const RegisterScreen = () => {
                         mode="outlined"
                         secureTextEntry
                         style={styles.input}
-                        left={<TextInput.Icon icon="lock" />}
+                        textColor="#222222"
+                        placeholderTextColor="#999999"
+                        outlineColor="#CCCCCC"
+                        activeOutlineColor="#7B61FF"
+                        left={<TextInput.Icon icon="lock" color="#999999" />}
+                        theme={{ colors: { background: '#FFFFFF' } }}
                     />
 
                     <TextInput
@@ -109,7 +131,12 @@ const RegisterScreen = () => {
                         mode="outlined"
                         secureTextEntry
                         style={styles.input}
-                        left={<TextInput.Icon icon="lock-check" />}
+                        textColor="#222222"
+                        placeholderTextColor="#999999"
+                        outlineColor="#CCCCCC"
+                        activeOutlineColor="#7B61FF"
+                        left={<TextInput.Icon icon="lock-check" color="#999999" />}
+                        theme={{ colors: { background: '#FFFFFF' } }}
                     />
 
                     {(error || localError) && (
@@ -118,19 +145,28 @@ const RegisterScreen = () => {
                         </Text>
                     )}
 
-                    <Button
-                        mode="contained"
-                        onPress={handleRegister}
-                        disabled={loading}
-                        style={styles.button}
-                        contentStyle={styles.buttonContent}>
-                        {loading ? <ActivityIndicator color="white" /> : 'Register'}
-                    </Button>
+                    <View style={styles.buttonWrapper}>
+                        <TouchableOpacity
+                            onPress={handleRegister}
+                            disabled={loading}
+                            activeOpacity={0.8}
+                            style={[
+                                styles.customButton,
+                                loading && styles.buttonDisabled
+                            ]}>
+                            {loading ? (
+                                <ActivityIndicator color="white" size="small" />
+                            ) : (
+                                <Text style={styles.buttonLabel}>Register</Text>
+                            )}
+                        </TouchableOpacity>
+                    </View>
 
                     <Button
-                        mode="outlined"
+                        mode="text"
                         onPress={navigateToLogin}
-                        style={styles.button}>
+                        textColor="#7B61FF"
+                        style={styles.textButton}>
                         Already have an account? Login
                     </Button>
                 </View>
@@ -147,24 +183,39 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
         padding: 24,
-        justifyContent: 'center',
+        paddingTop: 60, // Added top padding for balance
+        paddingBottom: 40,
     },
     header: {
         alignItems: 'center',
-        marginBottom: 40,
+        marginBottom: 32,
+    },
+    mascotContainer: {
+        width: 100,
+        height: 100,
+        borderRadius: 50,
+        backgroundColor: '#FFFFFF',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginBottom: 20,
+        ...SHADOWS.md,
+        borderWidth: 1,
+        borderColor: '#F1F5F9',
     },
     title: {
         fontWeight: 'bold',
-        color: COLORS.primary,
-        fontSize: 32,
+        color: COLORS.textSecondary,
+        fontSize: 16,
         marginBottom: 8,
-        letterSpacing: -1,
+        textTransform: 'uppercase',
+        letterSpacing: 2,
     },
     subtitle: {
-        fontWeight: '700',
-        fontSize: 24,
+        fontWeight: 'bold',
+        fontSize: 32,
         color: COLORS.text,
         marginBottom: 8,
+        letterSpacing: -1,
     },
     description: {
         color: COLORS.textSecondary,
@@ -172,25 +223,46 @@ const styles = StyleSheet.create({
     },
     form: {
         gap: 16,
-        backgroundColor: COLORS.surface,
+        backgroundColor: '#FFFFFF',
         padding: 24,
-        borderRadius: BORDER_RADIUS.xl,
-        ...SHADOWS.lg,
+        borderRadius: 16,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.08,
+        shadowRadius: 30,
+        elevation: 8,
         borderWidth: 1,
         borderColor: COLORS.borderLight,
     },
     input: {
         marginBottom: 8,
-        backgroundColor: COLORS.surface,
+        backgroundColor: '#FFFFFF',
         fontSize: 15,
-        height: 48,
+        height: 52,
     },
-    button: {
+    buttonWrapper: {
+        height: 52,
         marginTop: 8,
-        borderRadius: BORDER_RADIUS.lg,
     },
-    buttonContent: {
-        height: 56,
+    customButton: {
+        backgroundColor: '#7B61FF',
+        height: 52,
+        borderRadius: 12,
+        justifyContent: 'center',
+        alignItems: 'center',
+        flexDirection: 'row',
+        ...SHADOWS.md,
+    },
+    buttonDisabled: {
+        opacity: 0.7,
+    },
+    buttonLabel: {
+        fontSize: 16,
+        fontWeight: '600',
+        color: '#FFFFFF',
+    },
+    textButton: {
+        marginTop: 12,
     },
     error: {
         color: COLORS.error,

@@ -1,5 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import auth from '@react-native-firebase/auth';
+import { firestoreService } from '../../api/firestoreService';
+import { loadUserStats } from './gamificationSlice';
 
 interface User {
     uid: string;
@@ -23,14 +25,25 @@ const initialState: AuthState = {
 
 export const login = createAsyncThunk(
     'auth/login',
-    async ({ email, password }: { email: string; password: string }, { rejectWithValue }) => {
+    async ({ email, password }: { email: string; password: string }, { dispatch, rejectWithValue }) => {
         try {
             const userCredential = await auth().signInWithEmailAndPassword(email, password);
-            return {
+            const user = {
                 uid: userCredential.user.uid,
                 email: userCredential.user.email,
                 displayName: userCredential.user.displayName,
             };
+            
+            // Sync with Firestore in the background (non-blocking)
+            firestoreService.syncUserProfile(user.uid, {
+                displayName: user.displayName || 'Learner',
+                email: user.email || '',
+            }).then(() => {
+                // Load stats only after sync is confirmed in the background
+                dispatch(loadUserStats(user.uid));
+            });
+            
+            return user;
         } catch (error: any) {
             return rejectWithValue(error.message);
         }
@@ -41,16 +54,30 @@ export const register = createAsyncThunk(
     'auth/register',
     async (
         { email, password, displayName }: { email: string; password: string; displayName: string },
-        { rejectWithValue }
+        { dispatch, rejectWithValue }
     ) => {
         try {
             const userCredential = await auth().createUserWithEmailAndPassword(email, password);
             await userCredential.user.updateProfile({ displayName });
-            return {
+            
+            const user = {
                 uid: userCredential.user.uid,
                 email: userCredential.user.email,
                 displayName,
             };
+
+            // Initialize Firestore profile in the background
+            firestoreService.syncUserProfile(user.uid, {
+                displayName: user.displayName,
+                email: user.email || '',
+                totalXP: 0,
+                rank: 10,
+                badges: [],
+            }).then(() => {
+                dispatch(loadUserStats(user.uid));
+            });
+
+            return user;
         } catch (error: any) {
             return rejectWithValue(error.message);
         }
@@ -65,6 +92,10 @@ const authSlice = createSlice({
     name: 'auth',
     initialState,
     reducers: {
+        setUser: (state, action: PayloadAction<User | null>) => {
+            state.user = action.payload;
+            state.isAuthenticated = !!action.payload;
+        },
         clearError: (state) => {
             state.error = null;
         },
@@ -107,5 +138,5 @@ const authSlice = createSlice({
     },
 });
 
-export const { clearError } = authSlice.actions;
+export const { setUser, clearError } = authSlice.actions;
 export default authSlice.reducer;

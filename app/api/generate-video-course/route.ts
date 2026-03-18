@@ -86,6 +86,38 @@ export async function POST(req: Request) {
       JSON.stringify(videoCourseSchema.shape, null, 2)
     );
 
+    // Fallback if API Key is missing or Demo Mode is forced
+    const isMissingKey = !process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'your_openai_api_key_here';
+    const isForcedDemo = process.env.DEMO_MODE === 'true';
+
+    if (isMissingKey || isForcedDemo) {
+      console.log(`⚠️ [GENERATE-VIDEO-COURSE] ${isForcedDemo ? 'Demo Mode forced' : 'API Key missing'}, using mock fallback`);
+      const mockVideoCourse = {
+        title: `${prompt} Video Masterclass`,
+        description: `Visual walkthrough of the core ${prompt} principles.`,
+        total_sections: 5,
+        sections: Array.from({ length: 5 }).map((_, i) => ({
+          section_number: i + 1,
+          title: `Video Lesson ${i + 1}: ${prompt} Explained`,
+          content: `In this video lesson, we visually demonstrate how ${prompt} works and show you real-world examples in action. Note: This is an AI-simulated placeholder.`,
+          key_points: [
+            "Visual overview of the topic",
+            "Screen-recorded demonstration",
+            "Summary of best practices"
+          ],
+          quiz: {
+            question: `What was the main visual takeaway from this ${prompt} video?`,
+            options: ["The colors used", "A diagram or demo", "The animation style", "The font choice"],
+            correct_answer: "A diagram or demo",
+            explanation: "Visual learning is all about the diagrams and demonstrations that make complex topics clear!"
+          }
+        }))
+      };
+      // Simulate network delay
+      await new Promise(r => setTimeout(r, 2000));
+      return NextResponse.json(mockVideoCourse);
+    }
+
     const startTime = Date.now();
     const { object } = await generateObject({
       model: openai("gpt-4o"),
@@ -113,6 +145,33 @@ export async function POST(req: Request) {
       "❌ [GENERATE-VIDEO-COURSE] Video course generation error:",
       error
     );
+
+    // Fallback if quota is exceeded or other AI service errors
+    const errorString = JSON.stringify(error).toLowerCase() + (error instanceof Error ? error.message.toLowerCase() : "");
+    const isQuotaError = errorString.includes("quota") || errorString.includes("billing") || errorString.includes("limit") || errorString.includes("insufficient");
+    
+    if (isQuotaError) {
+      console.log("⚠️ [GENERATE-VIDEO-COURSE] AI Service Limit/Quota hit, using mock fallback");
+      const mockVideoCourse = {
+        title: `${prompt} Video Masterclass (Demo Mode)`,
+        description: `Visual walkthrough of ${prompt} principles. (Demo Mode due to API limits)`,
+        total_sections: 5,
+        sections: Array.from({ length: 5 }).map((_, i) => ({
+          section_number: i + 1,
+          title: `Video Lesson ${i + 1}: ${prompt} Explained`,
+          content: `In this video lesson, we visually demonstrate ${prompt}. Note: This is a demo placeholder.`,
+          key_points: ["Visuals", "Demo", "Summary"],
+          quiz: {
+            question: `What is the key takeaway for ${prompt}?`,
+            options: ["Visuals", "Knowledge", "Demo", "All"],
+            correct_answer: "Knowledge",
+            explanation: "Knowledge is the power!"
+          }
+        }))
+      };
+      return NextResponse.json(mockVideoCourse);
+    }
+
     console.error(
       "❌ [GENERATE-VIDEO-COURSE] Error stack:",
       error instanceof Error ? error.stack : "No stack trace"

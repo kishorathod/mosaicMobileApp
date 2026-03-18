@@ -3,8 +3,8 @@ import axios, { AxiosError } from 'axios';
 // Replace with your actual backend URL
 // For Android emulator: http://10.0.2.2:3000/api
 // For iOS simulator: http://localhost:3000/api
-// For physical device: Use your computer's IP address (e.g., http://192.168.1.100:3000/api)
-const API_BASE_URL = 'http://10.0.2.2:3000/api';
+// For physical device: Use your computer's IP address (e.g., http://192.168.1.5:3000/api)
+const API_BASE_URL = 'http://192.168.1.5:3000/api';
 
 export const api = axios.create({
     baseURL: API_BASE_URL,
@@ -55,6 +55,7 @@ export interface GenerateCourseRequest {
 }
 
 export interface Course {
+    id: string;
     title: string;
     description: string;
     total_slides: number;
@@ -79,6 +80,7 @@ export interface Quiz {
 }
 
 export interface AudioCourse {
+    id: string;
     title: string;
     description: string;
     audioUrl: string;
@@ -89,6 +91,7 @@ export interface AudioCourse {
 }
 
 export interface VideoCourse {
+    id: string;
     title: string;
     description: string;
     videoUrl: string;

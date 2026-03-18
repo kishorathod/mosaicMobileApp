@@ -129,13 +129,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: COLORS.surface,
+        backgroundColor: '#F9FAFB',
         borderWidth: 1,
-        borderColor: COLORS.border,
+        borderColor: '#E5E7EB',
         borderRadius: BORDER_RADIUS.md,
         paddingHorizontal: 16,
-        height: 48,
-        ...SHADOWS.sm,
+        height: 52,
     },
     pickerContent: {
         flexDirection: 'row',
@@ -143,8 +142,8 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     emoji: {
-        fontSize: TYPOGRAPHY.fontSize.xl,
-        marginRight: SPACING.sm,
+        fontSize: 18,
+        marginRight: SPACING.md,
     },
     selectedText: {
         fontSize: TYPOGRAPHY.fontSize.md,
@@ -205,8 +204,8 @@ const styles = StyleSheet.create({
         borderColor: COLORS.primary + '20',
     },
     optionEmoji: {
-        fontSize: TYPOGRAPHY.fontSize.xxl,
-        marginRight: SPACING.md,
+        fontSize: 24,
+        marginRight: SPACING.lg,
     },
     icon: {
         marginRight: SPACING.sm,

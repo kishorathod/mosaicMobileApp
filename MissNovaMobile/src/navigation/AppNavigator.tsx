@@ -10,6 +10,11 @@ import HomeScreen from '@/screens/home/HomeScreen';
 import CourseScreen from '@/screens/course/CourseScreen';
 import AudioCourseScreen from '@/screens/course/AudioCourseScreen';
 import VideoCourseScreen from '@/screens/course/VideoCourseScreen';
+import LoadingScreen from '@/screens/course/LoadingScreen';
+import CertificateScreen from '@/screens/course/CertificateScreen';
+import DegreesScreen from '@/screens/home/DegreesScreen';
+import LeaderboardScreen from '@/screens/home/LeaderboardScreen';
+import BadgesScreen from '@/screens/home/BadgesScreen';
 
 export type RootStackParamList = {
     Login: undefined;
@@ -18,6 +23,11 @@ export type RootStackParamList = {
     Course: { course: any };
     AudioCourse: { course: any };
     VideoCourse: { course: any };
+    Loading: { topic: string; courseType: string };
+    Certificate: { courseTitle: string; score: number };
+    Degrees: undefined;
+    Leaderboard: undefined;
+    Badges: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -39,6 +49,11 @@ export const AppNavigator = () => {
                         <Stack.Screen name="Course" component={CourseScreen} />
                         <Stack.Screen name="AudioCourse" component={AudioCourseScreen} />
                         <Stack.Screen name="VideoCourse" component={VideoCourseScreen} />
+                        <Stack.Screen name="Loading" component={LoadingScreen} />
+                        <Stack.Screen name="Certificate" component={CertificateScreen} />
+                        <Stack.Screen name="Degrees" component={DegreesScreen} />
+                        <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
+                        <Stack.Screen name="Badges" component={BadgesScreen} />
                     </>
                 )}
             </Stack.Navigator>
