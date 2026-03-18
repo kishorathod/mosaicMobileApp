@@ -28,16 +28,27 @@ jobs:
       - name: Install dependencies
         run: cd MissNovaMobile && npm install
 
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
       - name: Build Android Release APK
         run: |
           cd MissNovaMobile/android
           chmod +x gradlew
-          ./gradlew assembleRelease
+          ./gradlew assembleRelease --no-daemon
         env:
+          ANDROID_HOME: /usr/local/lib/android/sdk
           MYAPP_RELEASE_STORE_FILE: debug.keystore
           MYAPP_RELEASE_KEY_ALIAS: androiddebugkey
           MYAPP_RELEASE_STORE_PASSWORD: android
           MYAPP_RELEASE_KEY_PASSWORD: android
+          GRADLE_OPTS: "-Dorg.gradle.jvmargs=-Xmx4g -XX:MaxMetaspaceSize=512m"
 
       - name: Upload APK as GitHub Artifact
         uses: actions/upload-artifact@v4
