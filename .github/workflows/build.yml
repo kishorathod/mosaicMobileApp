@@ -1,0 +1,41 @@
+name: Build and Distribute
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Install dependencies
+        run: |
+          cd MissNovaMobile
+          npm install
+
+      - name: Build Android Release
+        run: |
+          cd MissNovaMobile/android
+          ./gradlew assembleRelease
+        env:
+          MYAPP_RELEASE_STORE_FILE: debug.keystore
+          MYAPP_RELEASE_KEY_ALIAS: androiddebugkey
+          MYAPP_RELEASE_STORE_PASSWORD: android
+          MYAPP_RELEASE_KEY_PASSWORD: android
+
+      - name: Upload APK to Firebase App Distribution
+        uses: w9jds/firebase-action@master
+        with:
+          args: appdistribution:distribute MissNovaMobile/android/app/build/outputs/apk/release/app-release.apk --app ${{ secrets.FIREBASE_ANDROID_APP_ID }} --groups "testers"
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
