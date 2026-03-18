@@ -18,12 +18,22 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: MissNovaMobile/package-lock.json
+
       - name: Install dependencies
         run: |
           cd MissNovaMobile
           npm install
 
-      - name: Build Android Release
+      - name: Grant Gradle execute permission
+        run: chmod +x MissNovaMobile/android/gradlew
+
+      - name: Build Android Release APK
         run: |
           cd MissNovaMobile/android
           ./gradlew assembleRelease
@@ -33,9 +43,18 @@ jobs:
           MYAPP_RELEASE_STORE_PASSWORD: android
           MYAPP_RELEASE_KEY_PASSWORD: android
 
-      - name: Upload APK to Firebase App Distribution
-        uses: w9jds/firebase-action@master
+      - name: Upload APK as GitHub Artifact
+        uses: actions/upload-artifact@v4
         with:
-          args: appdistribution:distribute MissNovaMobile/android/app/build/outputs/apk/release/app-release.apk --app ${{ secrets.FIREBASE_ANDROID_APP_ID }} --groups "testers"
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          name: MissNova-Android-Release
+          path: MissNovaMobile/android/app/build/outputs/apk/release/app-release.apk
+          retention-days: 30
+
+      - name: Upload to Firebase App Distribution
+        if: ${{ secrets.FIREBASE_TOKEN != '' && secrets.FIREBASE_ANDROID_APP_ID != '' }}
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
+          token: ${{ secrets.FIREBASE_TOKEN }}
+          groups: testers
+          file: MissNovaMobile/android/app/build/outputs/apk/release/app-release.apk
