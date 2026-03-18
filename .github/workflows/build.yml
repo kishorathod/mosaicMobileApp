@@ -26,9 +26,7 @@ jobs:
           cache-dependency-path: MissNovaMobile/package-lock.json
 
       - name: Install dependencies
-        run: |
-          cd MissNovaMobile
-          npm install
+        run: cd MissNovaMobile && npm install
 
       - name: Build Android Release APK
         run: |
@@ -47,15 +45,3 @@ jobs:
           name: MissNova-Android-Release
           path: MissNovaMobile/android/app/build/outputs/apk/release/app-release.apk
           retention-days: 30
-
-      - name: Upload to Firebase App Distribution
-        if: env.FIREBASE_TOKEN != ''
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
-          token: ${{ secrets.FIREBASE_TOKEN }}
-          groups: testers
-          file: MissNovaMobile/android/app/build/outputs/apk/release/app-release.apk
-        env:
-          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
