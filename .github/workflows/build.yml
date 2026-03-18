@@ -30,9 +30,6 @@ jobs:
           cd MissNovaMobile
           npm install
 
-      - name: Grant Gradle execute permission
-        run: chmod +x MissNovaMobile/android/gradlew
-
       - name: Build Android Release APK
         run: |
           cd MissNovaMobile/android
@@ -52,10 +49,13 @@ jobs:
           retention-days: 30
 
       - name: Upload to Firebase App Distribution
-        if: ${{ secrets.FIREBASE_TOKEN != '' && secrets.FIREBASE_ANDROID_APP_ID != '' }}
+        if: env.FIREBASE_TOKEN != ''
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
           appId: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
           token: ${{ secrets.FIREBASE_TOKEN }}
           groups: testers
           file: MissNovaMobile/android/app/build/outputs/apk/release/app-release.apk
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          FIREBASE_ANDROID_APP_ID: ${{ secrets.FIREBASE_ANDROID_APP_ID }}
