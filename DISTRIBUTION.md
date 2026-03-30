@@ -71,12 +71,34 @@ Testers receive an **email from Firebase** with a single download link.
 **Android:**
 - Tap the link → Install the Firebase App Distribution app → Download Miss Nova
 
-**iOS (future):**
-- Requires Apple Developer Account → Use TestFlight for distribution
+## 🍎 Why "Single Link" doesn't work for iOS
+
+Unlike Android, Apple **strictly forbids** downloading apps from the browser (side-loading). iOS devices can only install apps through:
+1. **The App Store** (Public)
+2. **TestFlight** (Official Apple Beta testing)
+3. **Internal/Enterprise** (Requires complex setup)
+
+### Requirements for iOS Distribution:
+1. **Apple Developer Program ($99/year)**: Mandatory for all distribution methods.
+2. **Mac/Xcode**: Required to generate the `.ipa` (build file).
+3. **TestFlight Invitations**: Once we build the app, we upload it to Apple's servers, and you invite testers by their email.
 
 ---
 
-## 🐛 If the Build Fails
+## 🛠️ iOS Next Steps (If you have a Developer Account)
+
+1. **Register Bundle ID**: The current ID is `com.missnova.mobile`. It must be registered in the Apple Developer portal.
+2. **Generate Certificates**: You need **Distribution Certificates** and **Provisioning Profiles**.
+3. **GitHub Actions for iOS**:
+   - I can update the workflow to build for iOS, but it requires adding your Apple ID and certificates to GitHub Secrets.
+   - It also uses `macos-latest` runners which are slower and use more credits.
+
+---
+
+## 🐛 If you don't have a Developer Account
+
+The only way to see the app on an iPhone without an account is:
+- **Local Run**: Plug the iPhone into a Mac, open `ios/TempApp.xcworkspace` in Xcode, and click "Run". This only works for the device plugged in.
 
 Check **Actions** tab on GitHub for error logs.
 
