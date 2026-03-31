@@ -136,7 +136,7 @@ export const CATEGORIES = [
   { value: 'technology', label: 'Technology', emoji: '💻', icon: 'application-brackets-outline', color: COLORS.technology },
   { value: 'science', label: 'Science', emoji: '🔬', icon: 'molecule', color: COLORS.science },
   { value: 'business', label: 'Business', emoji: '📊', icon: 'finance', color: COLORS.business },
-  { value: 'arts', label: 'Arts & Humanities', emoji: '🎨', icon: 'drawing-variant', color: COLORS.arts },
+  { value: 'arts', label: 'Arts & Humanities', emoji: '🎨', icon: 'palette', color: COLORS.arts },
   { value: 'health', label: 'Health & Wellness', emoji: '🧘', icon: 'heart-pulse', color: COLORS.health },
   { value: 'language', label: 'Language Learning', emoji: '🗣️', icon: 'badge-account-horizontal-outline', color: COLORS.language },
   { value: 'math', label: 'Mathematics', emoji: '🔢', icon: 'calculator-variant-outline', color: COLORS.math },
