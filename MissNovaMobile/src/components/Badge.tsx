@@ -28,20 +28,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 12,
-        height: 28,
-        borderRadius: 14,
+        height: 24, // Consistent height
+        borderRadius: BORDER_RADIUS.tag,
         borderWidth: 1,
     },
     emoji: {
-        fontSize: 14,
+        fontSize: 12,
         marginRight: 4,
     },
     icon: {
         marginRight: 4,
     },
     label: {
-        fontSize: 12,
-        fontWeight: '600',
-        letterSpacing: 0.5,
+        fontSize: 11,
+        fontWeight: 'bold',
+        letterSpacing: 0.2,
     },
 });

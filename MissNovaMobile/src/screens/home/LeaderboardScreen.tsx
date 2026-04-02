@@ -2,11 +2,13 @@ import React from 'react';
 import { View, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { Text, Avatar, Surface } from 'react-native-paper';
 import { useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RootState } from '@/store';
 import { COLORS, SHADOWS, SPACING } from '@/theme/theme';
 
 const LeaderboardScreen = () => {
+    const navigation = useNavigation();
     const { leaderboard } = useSelector((state: RootState) => state.gamification);
     const { user } = useSelector((state: RootState) => state.auth);
 
@@ -50,6 +52,12 @@ const LeaderboardScreen = () => {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
+                <TouchableOpacity 
+                    onPress={() => (navigation as any).canGoBack() ? navigation.goBack() : (navigation as any).navigate('Home')}
+                    style={styles.backButton}
+                >
+                    <Icon name="arrow-left" size={24} color="#111827" />
+                </TouchableOpacity>
                 <Icon name="trophy" size={48} color="#F59E0B" />
                 <Text style={styles.headerTitle}>Global Leaderboard</Text>
                 <Text style={styles.headerSubtitle}>Compete with students worldwide on EduChain</Text>
@@ -74,11 +82,25 @@ const styles = StyleSheet.create({
     header: {
         alignItems: 'center',
         paddingVertical: 32,
+        paddingHorizontal: 16,
         backgroundColor: '#FFFFFF',
         borderBottomLeftRadius: 32,
         borderBottomRightRadius: 32,
         ...SHADOWS.md,
         marginBottom: 16,
+        position: 'relative',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F8FAFC',
+        zIndex: 10,
     },
     headerTitle: {
         fontSize: 24,

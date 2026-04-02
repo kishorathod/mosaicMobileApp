@@ -9,7 +9,8 @@ import RoadmapTimeline from '@/components/RoadmapTimeline';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { RootState } from '@/store';
 import { setCurrentCourse } from '@/store/slices/courseSlice';
-import { syncCoursePoints, LeaderboardEntry } from '@/store/slices/gamificationSlice';
+import { syncCoursePoints } from '@/store/slices/gamificationSlice';
+import { LeaderboardEntry } from '@/types/gamification';
 import LeaderboardModal from '@/components/LeaderboardModal';
 import type { AnyCourse, SlideCourseData } from '@/store/slices/courseSlice';
 import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS, SHADOWS } from '@/theme/theme';
@@ -164,6 +165,19 @@ const CourseScreen = () => {
                     </Markdown>
                 </View>
 
+                <View style={styles.practiceCard}>
+                    <View style={styles.practiceHeader}>
+                        <Icon name="code-tags" size={24} color={COLORS.primary} />
+                        <Text style={styles.practiceTitle}>Practice Mode</Text>
+                    </View>
+                    <Text style={styles.practiceDesc}>
+                        Try writing a simple example of what you just learned:
+                    </Text>
+                    <View style={styles.codeMirror}>
+                        <Text style={styles.codeText}>// Try it here...</Text>
+                    </View>
+                </View>
+
                 <View style={styles.quizWrapper}>
                     <QuizWidget
                         quiz={currentSlide.quiz}
@@ -302,6 +316,42 @@ const styles = StyleSheet.create({
     quizWrapper: {
         marginHorizontal: 16,
         marginBottom: 32,
+    },
+    practiceCard: {
+        margin: 16,
+        marginTop: 0,
+        padding: 20,
+        backgroundColor: '#1E293B',
+        borderRadius: 16,
+        ...SHADOWS.md,
+    },
+    practiceHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 12,
+    },
+    practiceTitle: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        color: '#FFFFFF',
+    },
+    practiceDesc: {
+        fontSize: 13,
+        color: '#94A3B8',
+        marginBottom: 16,
+    },
+    codeMirror: {
+        backgroundColor: '#0F172A',
+        padding: 16,
+        borderRadius: 12,
+        borderWidth: 1,
+        borderColor: '#334155',
+    },
+    codeText: {
+        color: '#22C55E',
+        fontFamily: 'monospace',
+        fontSize: 13,
     },
     navigation: {
         paddingHorizontal: 16,

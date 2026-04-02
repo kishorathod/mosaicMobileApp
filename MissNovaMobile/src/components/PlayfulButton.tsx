@@ -1,15 +1,17 @@
-import React from 'react';
-import { TouchableOpacity, StyleSheet, View, Text, ViewStyle, TextStyle } from 'react-native';
-import { COLORS, BORDER_RADIUS, TYPOGRAPHY } from '@/theme/theme';
+import React, { useRef } from 'react';
+import { Pressable, StyleSheet, View, Text, ViewStyle, TextStyle, ActivityIndicator, Animated, StyleProp } from 'react-native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import { COLORS, BORDER_RADIUS, SHADOWS } from '@/theme/theme';
 
 interface PlayfulButtonProps {
     onPress: () => void;
     children: React.ReactNode;
-    style?: ViewStyle;
-    labelStyle?: TextStyle;
+    style?: StyleProp<ViewStyle>;
+    labelStyle?: StyleProp<TextStyle>;
     color?: string;
     disabled?: boolean;
     loading?: boolean;
+    icon?: string;
 }
 
 export const PlayfulButton: React.FC<PlayfulButtonProps> = ({
@@ -20,65 +22,96 @@ export const PlayfulButton: React.FC<PlayfulButtonProps> = ({
     color = COLORS.primary,
     disabled = false,
     loading = false,
+    icon,
 }) => {
+    const scaleAnim = useRef(new Animated.Value(1)).current;
+
+    const handlePressIn = () => {
+        Animated.spring(scaleAnim, {
+            toValue: 0.96,
+            useNativeDriver: true,
+        }).start();
+    };
+
+    const handlePressOut = () => {
+        Animated.spring(scaleAnim, {
+            toValue: 1,
+            friction: 4,
+            tension: 40,
+            useNativeDriver: true,
+        }).start();
+    };
+
     return (
-        <TouchableOpacity
-            onPress={onPress}
-            disabled={disabled || loading}
-            activeOpacity={0.9}
-            style={[
-                styles.button,
-                { backgroundColor: color },
-                disabled && styles.disabled,
-                style,
-            ]}
-        >
-            <View style={styles.content}>
+        <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+            <Pressable
+                onPress={onPress}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                disabled={disabled || loading}
+                style={({ pressed }) => [
+                    styles.button,
+                    { backgroundColor: color },
+                    (disabled || loading) && styles.disabled,
+                    style,
+                ]}
+            >
+            <View style={[styles.content, loading && { opacity: 0.6 }]}>
+                {icon && !loading && (
+                    <Icon name={icon} size={20} color="#FFFFFF" style={{ marginRight: 8 }} />
+                )}
                 {typeof children === 'string' ? (
                     <Text style={[styles.label, labelStyle]}>{children}</Text>
                 ) : (
                     children
                 )}
             </View>
-            <View style={[styles.shadow, { backgroundColor: color + '40' }]} />
-        </TouchableOpacity>
+            {loading && (
+                <View style={styles.loaderContainer}>
+                    <ActivityIndicator color="white" size="small" />
+                </View>
+            )}
+            </Pressable>
+        </Animated.View>
     );
 };
 
 const styles = StyleSheet.create({
     button: {
-        height: 56,
-        borderRadius: BORDER_RADIUS.full,
+        height: 54,
+        borderRadius: BORDER_RADIUS.button,
         justifyContent: 'center',
         alignItems: 'center',
         position: 'relative',
         zIndex: 1,
-        // The 3D effect is created using a darker bottom border or shadow view
-        borderBottomWidth: 4,
-        borderBottomColor: 'rgba(0,0,0,0.1)',
+        // Refined shadow logic
+        ...SHADOWS.soft,
     },
     disabled: {
-        backgroundColor: '#E2E8F0',
-        borderBottomColor: 'rgba(0,0,0,0.05)',
+        backgroundColor: '#F1F5F9',
+        opacity: 0.8,
     },
     content: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
+        width: '100%',
+        paddingHorizontal: 20,
     },
     label: {
         color: '#FFFFFF',
-        fontSize: 18,
-        fontWeight: TYPOGRAPHY.fontWeight.bold,
-        fontFamily: 'Nunito', // If loaded, otherwise system bold
+        fontSize: 16,
+        fontWeight: 'bold',
+        letterSpacing: 0.5,
+        textTransform: 'uppercase',
     },
-    shadow: {
+    loaderContainer: {
         position: 'absolute',
-        top: 4,
+        top: 0,
         left: 0,
         right: 0,
-        bottom: -4,
-        borderRadius: BORDER_RADIUS.full,
-        zIndex: -1,
+        bottom: 0,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
 });

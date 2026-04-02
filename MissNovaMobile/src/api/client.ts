@@ -4,7 +4,7 @@ import axios, { AxiosError } from 'axios';
 // For Android emulator: http://10.0.2.2:3000/api
 // For iOS simulator: http://localhost:3000/api
 // For physical device: Use your computer's IP address (e.g., http://192.168.1.5:3000/api)
-const API_BASE_URL = 'http://192.168.1.5:3000/api';
+const API_BASE_URL = 'https://mosaic-mobile-app.vercel.app/api';
 
 export const api = axios.create({
     baseURL: API_BASE_URL,

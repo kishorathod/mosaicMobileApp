@@ -1,42 +1,37 @@
 import { createSlice, PayloadAction, createAsyncThunk } from '@reduxjs/toolkit';
 import { firestoreService } from '../../api/firestoreService';
-
-export interface Badge {
-  id: string;
-  name: string;
-  icon: string;
-  description: string;
-  unlockedAt?: string;
-}
-
-export interface LeaderboardEntry {
-  id: string;
-  name: string;
-  points: number;
-  rank: number;
-  isMe?: boolean;
-}
+import { Badge, LeaderboardEntry } from '../../types/gamification';
 
 interface GamificationState {
   totalXP: number;
+  dailyXP: number;
+  dailyGoal: number;
+  streakCount: number;
   rank: number;
   badges: Badge[];
   recentActivity: string[];
   coursePoints: Record<string, number>; // courseId -> points
   leaderboard: LeaderboardEntry[];
   enrolledDegrees: string[]; // IDs of enrolled degrees
+  userCourses: any[]; 
+  badgeCount: number;
   loading: boolean;
   error: string | null;
 }
 
 const initialState: GamificationState = {
   totalXP: 0,
+  dailyXP: 120, // Mocked for now
+  dailyGoal: 500, // Mocked for now (XP target)
+  streakCount: 5, // Mocked for now
   rank: 10,
   badges: [],
   recentActivity: [],
   coursePoints: {},
   leaderboard: [],
   enrolledDegrees: [],
+  userCourses: [],
+  badgeCount: 0,
   loading: false,
   error: null,
 };
@@ -102,6 +97,19 @@ export const enrollInDegree = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch user enrolled courses and progress
+export const fetchUserCourses = createAsyncThunk(
+  'gamification/fetchUserCourses',
+  async (uid: string, { rejectWithValue }) => {
+    try {
+      const courses = await firestoreService.getUserEnrolledCourses(uid);
+      return courses;
+    } catch (error: any) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const gamificationSlice = createSlice({
   name: 'gamification',
   initialState,
@@ -126,6 +134,7 @@ const gamificationSlice = createSlice({
     unlockBadge: (state, action: PayloadAction<Badge>) => {
       if (!state.badges.find(b => b.id === action.payload.id)) {
         state.badges.push({ ...action.payload, unlockedAt: new Date().toISOString() });
+        state.badgeCount = state.badges.length;
       }
     },
     addEnrolledDegree: (state, action: PayloadAction<string>) => {
@@ -144,6 +153,7 @@ const gamificationSlice = createSlice({
         if (action.payload) {
           state.totalXP = action.payload.totalXP || 0;
           state.badges = action.payload.badges || [];
+          state.badgeCount = state.badges.length;
           state.enrolledDegrees = action.payload.enrolledDegrees || [];
           state.rank = Math.max(1, 10 - Math.floor(state.totalXP / 1000));
         }
@@ -156,6 +166,17 @@ const gamificationSlice = createSlice({
         if (!state.enrolledDegrees.includes(action.payload)) {
           state.enrolledDegrees.push(action.payload);
         }
+      })
+      .addCase(fetchUserCourses.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchUserCourses.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userCourses = action.payload;
+      })
+      .addCase(fetchUserCourses.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });

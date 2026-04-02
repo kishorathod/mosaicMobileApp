@@ -16,6 +16,8 @@ import DegreesScreen from '@/screens/home/DegreesScreen';
 import LeaderboardScreen from '@/screens/home/LeaderboardScreen';
 import BadgesScreen from '@/screens/home/BadgesScreen';
 import AIAssistantScreen from '@/screens/home/AIAssistantScreen';
+import LearningPathScreen from '@/screens/course/LearningPathScreen';
+import DashboardScreen from '../screens/home/DashboardScreen';
 
 export type RootStackParamList = {
     Login: undefined;
@@ -30,6 +32,8 @@ export type RootStackParamList = {
     Leaderboard: undefined;
     Badges: undefined;
     AIAssistant: undefined;
+    LearningPath: { topic: string };
+    Dashboard: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -57,6 +61,8 @@ export const AppNavigator = () => {
                         <Stack.Screen name="Leaderboard" component={LeaderboardScreen} />
                         <Stack.Screen name="Badges" component={BadgesScreen} />
                         <Stack.Screen name="AIAssistant" component={AIAssistantScreen} />
+                        <Stack.Screen name="LearningPath" component={LearningPathScreen} />
+                        <Stack.Screen name="Dashboard" component={DashboardScreen} />
                     </>
                 )}
             </Stack.Navigator>

@@ -27,7 +27,7 @@ const DegreesScreen = () => {
         <View style={styles.container}>
             <View style={styles.header}>
                 <TouchableOpacity 
-                    onPress={() => navigation.goBack()}
+                    onPress={() => (navigation as any).canGoBack() ? navigation.goBack() : (navigation as any).navigate('Home')}
                     style={styles.backButton}
                 >
                     <Icon name="arrow-left" size={24} color="#111827" />

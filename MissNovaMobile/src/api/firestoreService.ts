@@ -1,5 +1,5 @@
 import firestore from '@react-native-firebase/firestore';
-import { Badge, LeaderboardEntry } from '../store/slices/gamificationSlice';
+import { Badge, LeaderboardEntry } from '../types/gamification';
 
 const USERS_COLLECTION = 'users';
 
@@ -124,4 +124,115 @@ export const firestoreService = {
         }
       );
   },
+
+  /**
+   * Fetches a list of featured/new courses for exploration.
+   */
+  getExploreCourses: async (): Promise<any[]> => {
+    try {
+      const snapshot = await firestore().collection('courses').limit(10).get();
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    } catch (error) {
+      console.error('❌ [Firestore] Error fetching explore courses:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Fetches the user's enrolled courses and their progress.
+   */
+  getUserEnrolledCourses: async (uid: string): Promise<any[]> => {
+    try {
+      const snapshot = await firestore()
+        .collection('user_courses')
+        .where('userId', '==', uid)
+        .get();
+      return snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      }));
+    } catch (error) {
+      console.error('❌ [Firestore] Error fetching user enrolled courses:', error);
+      return [];
+    }
+  },
+
+  /**
+   * Saves a generated AI course to the user's personal collection.
+   */
+  saveGeneratedCourse: async (uid: string, courseData: any) => {
+    try {
+      const courseRef = firestore().collection('user_courses').doc();
+      await courseRef.set({
+        ...courseData,
+        userId: uid,
+        enrolledAt: new Date().toISOString(),
+        progress: 0,
+        lastStudied: new Date().toISOString(),
+      });
+      console.log('✅ [Firestore] Generated course saved:', courseRef.id);
+      return courseRef.id;
+    } catch (error) {
+      console.error('❌ [Firestore] Error saving generated course:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Seeds initial courses if the collection is empty.
+   */
+  seedInitialCourses: async () => {
+    try {
+      const coursesRef = firestore().collection('courses');
+      const snapshot = await coursesRef.limit(1).get();
+      
+      if (snapshot.empty) {
+        const seedData = [
+          {
+            title: 'Python for AI Mastery',
+            author: 'Dr. Sarah Kim',
+            category: 'Data Science',
+            categoryColor: '#E0F2FE',
+            accentColor: '#0EA5E9',
+            icon: 'language-python',
+            difficulty: 'Beginner',
+            lessons: 12,
+            popularity: 98,
+          },
+          {
+            title: 'Advanced React Native Hooks',
+            author: 'Michael Chen',
+            category: 'Development',
+            categoryColor: '#F0F9FF',
+            accentColor: '#1DA1F2',
+            icon: 'react',
+            difficulty: 'Advanced',
+            lessons: 8,
+            popularity: 85,
+          },
+          {
+            title: 'Quantum Physics Basics',
+            author: 'Prof. Julian Wick',
+            category: 'Academic',
+            categoryColor: '#F5F3FF',
+            accentColor: '#8B5CF6',
+            icon: 'atom',
+            difficulty: 'Intermediate',
+            lessons: 15,
+            popularity: 72,
+          }
+        ];
+        
+        for (const course of seedData) {
+          await coursesRef.add(course);
+        }
+        console.log('🌱 [Firestore] Successfully seeded initial courses');
+      }
+    } catch (error) {
+      console.error('❌ [Firestore] Error seeding courses:', error);
+    }
+  }
 };

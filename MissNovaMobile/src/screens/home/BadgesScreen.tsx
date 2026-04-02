@@ -1,7 +1,8 @@
 import React from 'react';
-import { View, StyleSheet, FlatList, Dimensions } from 'react-native';
+import { View, StyleSheet, FlatList, Dimensions, TouchableOpacity } from 'react-native';
 import { Text, Surface } from 'react-native-paper';
 import { useSelector } from 'react-redux';
+import { useNavigation } from '@react-navigation/native';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { RootState } from '@/store';
 import { COLORS, SHADOWS } from '@/theme/theme';
@@ -10,6 +11,7 @@ const { width } = Dimensions.get('window');
 const COLUMN_WIDTH = (width - 48) / 2;
 
 const BadgesScreen = () => {
+    const navigation = useNavigation();
     const { badges } = useSelector((state: RootState) => state.gamification);
 
     const renderItem = ({ item }: { item: any }) => {
@@ -50,6 +52,12 @@ const BadgesScreen = () => {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
+                <TouchableOpacity 
+                    onPress={() => (navigation as any).canGoBack() ? navigation.goBack() : (navigation as any).navigate('Home')}
+                    style={styles.backButton}
+                >
+                    <Icon name="arrow-left" size={24} color="#111827" />
+                </TouchableOpacity>
                 <View style={styles.headerIcon}>
                     <Icon name="seal-variant" size={40} color="#8B5CF6" />
                 </View>
@@ -86,6 +94,19 @@ const styles = StyleSheet.create({
         borderBottomRightRadius: 32,
         ...SHADOWS.md,
         marginBottom: 8,
+        position: 'relative',
+    },
+    backButton: {
+        position: 'absolute',
+        top: 20,
+        left: 20,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#F8FAFC',
+        zIndex: 10,
     },
     headerIcon: {
         width: 64,

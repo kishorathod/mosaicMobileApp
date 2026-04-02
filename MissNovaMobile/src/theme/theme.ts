@@ -46,27 +46,53 @@ export const COLORS = {
   history: '#F97316',
   lifestyle: '#84CC16',
   other: '#64748B',
+
+  // Gradient Colors (Semantic)
+  gradientStart: '#1DA1F2',
+  gradientEnd: '#3B82F6',
+  accentGradientStart: '#8B5CF6',
+  accentGradientEnd: '#6D28D9',
 };
 
+export const GRADIENTS = {
+  primary: ['#1DA1F2', '#3B82F6'],
+  secondary: ['#65A30D', '#84CC16'],
+  accent: ['#8B5CF6', '#6D28D9'],
+  surface: ['#FFFFFF', '#F8FAFC'],
+};
+
+export const LEVEL_COLORS = [
+  '#94A3B8', // Lvl 1
+  '#64748B', // Lvl 2
+  '#475569', // Lvl 3
+  '#0EA5E9', // Lvl 4
+  '#0284C7', // Lvl 5
+  '#8B5CF6', // Lvl 6
+  '#7C3AED', // Lvl 7
+  '#F59E0B', // Lvl 8
+  '#D97706', // Lvl 9
+  '#EF4444', // Lvl 10 (Fire!)
+];
+
 export const SPACING = {
-  xs: 4,
-  sm: 8,
-  md: 16,
-  lg: 24,
-  xl: 32,
-  xxl: 48,
+  xs: 8,   // Small gap
+  sm: 16,  // Section gap
+  md: 24,  // Major section gap
+  lg: 32,
+  xl: 40,
+  xxl: 56,
 };
 
 export const TYPOGRAPHY = {
   // Font Sizes
   fontSize: {
-    xs: 12,
-    sm: 14,
-    md: 15, // Adjusted to user request
-    lg: 18,
-    xl: 20,
-    xxl: 24,
-    xxxl: 32,
+    xs: 12,   // Caption
+    sm: 14,   // Subheading (lower)
+    md: 16,   // Subheading (higher)
+    lg: 20,   // Heading
+    xl: 24,
+    xxl: 28,
+    xxxl: 36,
   },
 
   // Font Weights
@@ -86,11 +112,9 @@ export const TYPOGRAPHY = {
 };
 
 export const BORDER_RADIUS = {
-  xs: 4,
-  sm: 8,
-  md: 12, // Web's rounded-xl
-  lg: 16, // Web's rounded-2xl
-  xl: 24, // Web's rounded-3xl
+  card: 12,    // Cards
+  button: 10,  // Buttons
+  tag: 20,     // Tags (Pill)
   full: 9999,
 };
 
@@ -129,6 +153,20 @@ export const SHADOWS = {
     shadowOpacity: 0.1,
     shadowRadius: 0, // Hard shadow for 3D effect
     elevation: 4,
+  },
+  soft: {
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.05,
+    shadowRadius: 20,
+    elevation: 2,
+  },
+  premium: {
+    shadowColor: '#1DA1F2',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 24,
+    elevation: 5,
   },
 };
 
